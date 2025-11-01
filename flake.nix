@@ -18,16 +18,7 @@
           config.allowUnfree = true;
         };
 
-        # Build Python with PGO optimizations enabled and LTO (already enabled by default on 64-bit systems)
-        pythonInterpreter = let
-          self = pkgs.python313.override {
-            enableOptimizations = true;
-            inherit self;
-          };
-        in
-          self;
-
-        pythonPackages = with pythonInterpreter.pkgs; [
+        pythonPackages = with pkgs.python3Packages; [
           jupyter-core
           notebook
           ipykernel
@@ -76,12 +67,12 @@
           buildInputs =
             devTools
             ++ pythonPackages
-            ++ [pythonInterpreter];
+            ++ [pkgs.python3];
         };
 
         packages = {
-          default = pythonInterpreter.withPackages (ps: pythonPackages);
-          python = pythonInterpreter;
+          default = pkgs.python3.withPackages (ps: pythonPackages);
+          python = pkgs.python3;
         };
 
         formatter = pkgs.alejandra;
