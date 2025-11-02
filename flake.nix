@@ -56,7 +56,6 @@
         devTools = with pkgs; [
           basedpyright
           ruff
-          # TeX tools from default.nix
           tex
           texlab
           tectonic
