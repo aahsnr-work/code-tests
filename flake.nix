@@ -36,7 +36,7 @@
         tex = pkgs.texlive.combine {
           inherit
             (pkgs.texlive)
-            scheme-minimal
+            scheme-medium
             metapost
             xetex
             dvisvgm
@@ -47,6 +47,7 @@
             hyperref
             capt-of
             physics
+            latex
             siunitx
             booktabs
             ;
