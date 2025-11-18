@@ -12,10 +12,9 @@ Before running these tests:
 
 * Test 1: Basic Execution and Environment Verification
 
-#+begin_src jupyter-python :results output
+#+begin_src jupyter-python :session py
 import sys
 import platform
-
 
 print("=" * 60)
 print("ENVIRONMENT INFORMATION")
@@ -26,14 +25,25 @@ print(f"Platform: {platform.platform()}")
 print(f"Architecture: {platform.machine()}")
 print("=" * 60)
 #+end_src
-
+:END:
 #+RESULTS:
 : ============================================================
 : ENVIRONMENT INFORMATION
 : ============================================================
+: Python Version: 3.13.7 (main, Sep  9 2025, 16:20:24) [GCC 15.2.1 20250813]
+: Python Executable: /usr/bin/python
+: Platform: Linux-6.17.7-5-cachyos-x86_64-with-glibc2.42
+: Architecture: x86_64
+: ============================================================
+
+#+RESULTS:
+
+: ============================================================
+: ENVIRONMENT INFORMATION
+: ============================================================
 : Python Version: 3.13.8 (main, Oct  7 2025, 12:01:51) [GCC 14.3.0]
-: Python Executable: /nix/store/cfapjd2rvqrpry4grb0kljnp8bvnvfxz-python3-3.13.8/bin/python3.13
-: Platform: Linux-6.17.5-xanmod1-x86_64-with-glibc2.40
+: Python Executable: /nix/store/cfapjd2rvqrpry4grb0kljnp8bvnvfxz-python3-3.13.8/bin/python
+: Platform: Linux-6.17.7-5-cachyos-x86_64-with-glibc2.40
 : Architecture: x86_64
 : ============================================================
 
@@ -43,7 +53,7 @@ print("=" * 60)
 """Test that all required packages from flake.nix are available"""
 
 required_packages = [
-    'numpy', 'scipy', 'pandas', 'sklearn', 
+    'numpy', 'scipy', 'pandas', 'sklearn',
     'matplotlib', 'seaborn', 'ipywidgets',
     'debugpy', 'ruff', 'mypy'
 ]
@@ -741,11 +751,11 @@ sizes = [100, 500, 1000]
 for size in sizes:
     A = np.random.randn(size, size)
     B = np.random.randn(size, size)
-    
+
     start_time = time.time()
     C = A @ B
     mult_time = time.time() - start_time
-    
+
     print(f"   {size}x{size} matrices: {mult_time:.4f}s")
 
 # Cleanup
@@ -786,13 +796,13 @@ Test LSP features interactively:
 
 1. HOVER: Position cursor over function/variable names and press 'K' or use eldoc
    - Try hovering over: pd.DataFrame, np.array, calculate_statistics
-   
+
 2. GOTO DEFINITION: Press 'gd' or 'C-c c d' on a function name
    - Try going to definition of: calculate_statistics
-   
+
 3. FIND REFERENCES: Press 'C-c c R' on a variable/function name
    - Try finding references to: test_data
-   
+
 4. CODE ACTIONS: Press 'C-c c a' to see available code actions
    - Try it on an import statement
 """
@@ -802,10 +812,10 @@ import numpy as np
 
 def calculate_statistics(data: np.ndarray) -> dict:
     """Calculate basic statistics for array data.
-    
+
     Args:
         data: Input array
-        
+
     Returns:
         Dictionary with mean, std, min, max
     """

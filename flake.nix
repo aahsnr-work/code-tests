@@ -6,13 +6,15 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = {
-    self,
-    nixpkgs,
-    flake-utils,
-  }:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+    }:
     flake-utils.lib.eachDefaultSystem (
-      system: let
+      system:
+      let
         pkgs = import nixpkgs {
           inherit system;
           config.allowUnfree = true;
@@ -30,12 +32,12 @@
           matplotlib
           seaborn
           debugpy
+          pytest
         ];
 
         # TeX packages from default.nix
         tex = pkgs.texlive.combine {
-          inherit
-            (pkgs.texlive)
+          inherit (pkgs.texlive)
             scheme-medium
             metapost
             xetex
@@ -57,17 +59,11 @@
           basedpyright
           ruff
           tex
-          texlab
-          tectonic
-          ghostscript
-          imagemagick
         ];
-      in {
+      in
+      {
         devShells.default = pkgs.mkShell {
-          buildInputs =
-            devTools
-            ++ pythonPackages
-            ++ [pkgs.python3];
+          buildInputs = devTools ++ pythonPackages ++ [ pkgs.python3 ];
         };
 
         packages = {

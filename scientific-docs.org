@@ -59,7 +59,7 @@ Wavefunctions:
 
 *** Environment Setup with Testing Infrastructure
 
-#+begin_src python :results silent
+#+begin_src jupyter-python
 """
 Quantum Harmonic Oscillator Computational Physics Masterclass
 Environment setup with testing infrastructure
@@ -120,6 +120,21 @@ logger.info(f"  NumPy version: {np.__version__}")
 logger.info(f"  SciPy version: {sp.__version__}")
 logger.info(f"  pytest available for testing")
 #+end_src
+
+#+RESULTS:
+:RESULTS:
+# [goto error]
+: [31m---------------------------------------------------------------------------[39m
+: [31mModuleNotFoundError[39m                       Traceback (most recent call last)
+: [36mCell[39m[36m [39m[32mIn[1][39m[32m, line 19[39m
+: [32m     16[39m [38;5;28;01mimport[39;00m[38;5;250m [39m[34;01mlogging[39;00m
+: [32m     18[39m [38;5;66;03m# Testing imports[39;00m
+: [32m---> [39m[32m19[39m [38;5;28;01mimport[39;00m[38;5;250m [39m[34;01mpytest[39;00m
+: [32m     20[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mhypothesis[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m given, strategies [38;5;28;01mas[39;00m st, settings
+: [32m     21[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mhypothesis[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m assume, note
+:
+: [31mModuleNotFoundError[39m: No module named 'pytest'
+:END:
 
 *** Custom Exceptions with Validation and Testing
 
@@ -207,65 +222,65 @@ This demonstrates best practices for scientific computing tests
 
 class TestQuantumMechanicsFoundations:
     """Test suite for fundamental quantum mechanics properties"""
-    
+
     def test_uncertainty_principle(self):
         """Test Heisenberg uncertainty principle: Δx·Δp ≥ ℏ/2"""
         # This is a fundamental requirement all quantum states must satisfy
         x = np.linspace(-10, 10, 1000)
         dx = x[1] - x[0]
-        
+
         # Gaussian wave packet
         sigma_x = 1.0
         psi = np.exp(-x**2 / (2 * sigma_x**2))
         psi /= np.sqrt(np.trapz(np.abs(psi)**2, x))
-        
+
         # Calculate position uncertainty
         x_mean = np.trapz(np.abs(psi)**2 * x, x)
         x2_mean = np.trapz(np.abs(psi)**2 * x**2, x)
         delta_x = np.sqrt(x2_mean - x_mean**2)
-        
+
         # Calculate momentum uncertainty via Fourier transform
         psi_k = np.fft.fft(psi)
         k = 2 * np.pi * np.fft.fftfreq(len(x), dx)
         k_sorted = np.fft.fftshift(k)
         psi_k_sorted = np.fft.fftshift(psi_k)
-        
+
         p = HBAR * k_sorted
         prob_p = np.abs(psi_k_sorted)**2
         prob_p /= np.trapz(prob_p, p)
-        
+
         p_mean = np.trapz(prob_p * p, p)
         p2_mean = np.trapz(prob_p * p**2, p)
         delta_p = np.sqrt(np.abs(p2_mean - p_mean**2))
-        
+
         uncertainty_product = delta_x * delta_p
-        
+
         assert uncertainty_product >= HBAR / 2 * 0.99, \
             f"Uncertainty principle violated: Δx·Δp = {uncertainty_product:.6f}"
-        
+
         logger.info(f"✓ Uncertainty principle: Δx·Δp = {uncertainty_product:.6f}ℏ")
-    
+
     def test_probability_conservation(self):
         """Test that probability is conserved: ∫|ψ|² dx = 1"""
         x = np.linspace(-10, 10, 1000)
-        
+
         # Test multiple wavefunctions
         test_functions = [
             np.exp(-x**2),  # Gaussian
             np.sin(x) * np.exp(-x**2/4),  # Modulated Gaussian
             (1 + x**2) * np.exp(-x**2)  # Polynomial times Gaussian
         ]
-        
+
         for i, psi_unnormalized in enumerate(test_functions):
             # Normalize
             norm = np.sqrt(np.trapz(np.abs(psi_unnormalized)**2, x))
             psi = psi_unnormalized / norm
-            
+
             # Check normalization
             total_prob = np.trapz(np.abs(psi)**2, x)
             assert np.isclose(total_prob, 1.0, rtol=1e-6), \
                 f"Test function {i}: ∫|ψ|² = {total_prob:.10f} ≠ 1"
-        
+
         logger.info("✓ Probability conservation verified for multiple functions")
 
     @pytest.mark.parametrize("n", [0, 1, 2, 5, 10])
@@ -274,11 +289,11 @@ class TestQuantumMechanicsFoundations:
         # Valid quantum numbers should not raise errors
         assert n >= 0
         assert isinstance(n, int)
-        
+
     def test_invalid_quantum_numbers(self):
         """Test that invalid quantum numbers raise appropriate errors"""
         invalid_numbers = [-1, -5, 3.5, "two", None]
-        
+
         for invalid_n in invalid_numbers:
             with pytest.raises((InvalidQuantumNumberError, TypeError)):
                 if not isinstance(invalid_n, int) or invalid_n < 0:
@@ -307,29 +322,29 @@ def test_gaussian_wavepacket_properties(sigma, x0):
     """Test that Gaussian wave packets satisfy quantum mechanical properties"""
     x = np.linspace(-20, 20, 1000)
     dx = x[1] - x[0]
-    
+
     # Create Gaussian wave packet
     psi = np.exp(-(x - x0)**2 / (2 * sigma**2))
-    
+
     # Normalize
     norm = np.sqrt(np.trapz(np.abs(psi)**2, x))
     assume(norm > 0.01)  # Skip if norm too small
     psi_normalized = psi / norm
-    
+
     # Property 1: Normalization
     total_prob = np.trapz(np.abs(psi_normalized)**2, x)
     assert np.isclose(total_prob, 1.0, rtol=1e-3), \
         f"Normalization failed: ∫|ψ|² = {total_prob}"
-    
+
     # Property 2: Position expectation value near x0
     x_mean = np.trapz(np.abs(psi_normalized)**2 * x, x)
     assert np.abs(x_mean - x0) < sigma, \
         f"<x> = {x_mean:.3f} too far from x0 = {x0:.3f}"
-    
+
     # Property 3: Minimum uncertainty product for Gaussian
     x2_mean = np.trapz(np.abs(psi_normalized)**2 * x**2, x)
     delta_x = np.sqrt(x2_mean - x_mean**2)
-    
+
     # For Gaussian, Δx ≈ σ
     assert np.isclose(delta_x, sigma, rtol=0.1), \
         f"Δx = {delta_x:.3f} doesn't match σ = {sigma:.3f}"
@@ -343,14 +358,14 @@ def test_hermite_polynomial_orthogonality(n, grid_size):
     """Test Hermite polynomial orthogonality"""
     x = np.linspace(-5, 5, grid_size)
     weight = np.exp(-x**2)
-    
+
     # Generate two adjacent Hermite polynomials
     H_n = sp.special.hermite(n, monic=False)(x)
     H_n1 = sp.special.hermite(n+1, monic=False)(x)
-    
+
     # Calculate overlap
     overlap = np.trapz(H_n * H_n1 * weight, x)
-    
+
     # Should be orthogonal
     assert np.abs(overlap) < 1.0, \
         f"Hermite H_{n} and H_{n+1} not orthogonal: overlap = {overlap}"
@@ -374,12 +389,12 @@ Abstract base class for quantum systems with built-in validation
 class QuantumSystem(ABC):
     """
     Abstract base class for one-dimensional quantum systems.
-    
+
     All concrete quantum systems must implement:
     - potential(x): Return V(x)
     - analytical_energy(n): Return analytical energy (if known)
     - analytical_wavefunction(x, n): Return analytical ψ_n(x) (if known)
-    
+
     Includes comprehensive validation and testing utilities.
     """
 
@@ -390,10 +405,10 @@ class QuantumSystem(ABC):
         else:
             self.x_grid = x_grid
         self.dx = self.x_grid[1] - self.x_grid[0]
-        
+
         # Validation
         self._validate_initialization()
-    
+
     def _validate_initialization(self):
         """Validate system initialization parameters"""
         if self.mass <= 0:
@@ -411,10 +426,10 @@ class QuantumSystem(ABC):
     def get_hamiltonian_matrix(self) -> np.ndarray:
         """
         Construct Hamiltonian matrix using finite difference method.
-        
+
         Returns:
             H: Hamiltonian matrix (N × N)
-        
+
         Raises:
             ValueError: If grid is too coarse for accurate representation
         """
@@ -450,7 +465,7 @@ class QuantumSystem(ABC):
         Returns:
             energies: Array of energy eigenvalues
             wavefunctions: Array of wavefunctions (n_states × N_POINTS)
-            
+
         Raises:
             ConvergenceError: If eigenvalue solver fails
             NormalizationError: If normalization fails
@@ -479,7 +494,7 @@ class QuantumSystem(ABC):
             self._validate_eigensolution(energies, wavefunctions)
 
         return energies, wavefunctions
-    
+
     def _validate_eigensolution(
         self, energies: np.ndarray, wavefunctions: np.ndarray
     ):
@@ -489,12 +504,12 @@ class QuantumSystem(ABC):
             norm = np.trapz(psi**2, self.x_grid)
             if not np.isclose(norm, 1.0, rtol=TOLERANCE_NORM):
                 raise NormalizationError(norm)
-        
+
         # Check orthogonality
         for i in range(len(wavefunctions)):
             for j in range(i+1, min(i+5, len(wavefunctions))):
                 overlap = np.trapz(
-                    wavefunctions[i] * wavefunctions[j], 
+                    wavefunctions[i] * wavefunctions[j],
                     self.x_grid
                 )
                 if not np.isclose(overlap, 0.0, atol=TOLERANCE_ORTHOGONAL):
@@ -502,11 +517,11 @@ class QuantumSystem(ABC):
                         f"States {i} and {j} not perfectly orthogonal: "
                         f"<i|j> = {overlap:.2e}"
                     )
-        
+
         # Check energy ordering
         if not np.all(np.diff(energies) >= 0):
             raise ValueError("Energy eigenvalues not properly ordered")
-        
+
         logger.debug(f"✓ Validated {len(energies)} eigenstates")
 
     @abstractmethod
@@ -532,21 +547,21 @@ Concrete implementation of quantum harmonic oscillator with testing
 class QuantumHarmonicOscillator(QuantumSystem):
     """
     Quantum harmonic oscillator: V(x) = ½mω²x²
-    
+
     This class includes both numerical and analytical solutions,
     with comprehensive validation and testing capabilities.
     """
 
     def __init__(
-        self, 
-        mass: float = MASS, 
+        self,
+        mass: float = MASS,
         omega: float = OMEGA,
         x_grid: Optional[np.ndarray] = None
     ):
         super().__init__(mass, x_grid)
         self.omega = omega
         self.alpha = np.sqrt(mass * omega / HBAR)
-        
+
         if self.omega <= 0:
             raise ValueError(f"Frequency must be positive, got {omega}")
 
@@ -558,7 +573,7 @@ class QuantumHarmonicOscillator(QuantumSystem):
     def analytical_energy(self, n: int) -> float:
         """
         Exact energy eigenvalue: E_n = ℏω(n + ½)
-        
+
         This is the ground truth for validating numerical methods.
         """
         return HBAR * self.omega * (n + 0.5)
@@ -568,9 +583,9 @@ class QuantumHarmonicOscillator(QuantumSystem):
     def analytical_wavefunction(self, x: np.ndarray, n: int) -> np.ndarray:
         """
         Exact wavefunction using Hermite polynomials.
-        
+
         ψ_n(x) = (α/π)^(1/4) · 1/√(2^n n!) · H_n(αx) · exp(-α²x²/2)
-        
+
         Automatically normalized via decorator.
         """
         # Normalization constant
@@ -585,11 +600,11 @@ class QuantumHarmonicOscillator(QuantumSystem):
         psi = norm * hermite(xi) * np.exp(-xi**2 / 2)
 
         return psi
-    
+
     def verify_analytical_properties(self, n_max: int = 10) -> Dict[str, Any]:
         """
         Verify analytical solution satisfies all quantum mechanical properties.
-        
+
         Returns:
             Dictionary with verification results
         """
@@ -599,7 +614,7 @@ class QuantumHarmonicOscillator(QuantumSystem):
             'energy_spacing': [],
             'expectation_values': {}
         }
-        
+
         # Test normalization
         for n in range(n_max):
             psi = self.analytical_wavefunction(self.x_grid, n)
@@ -609,7 +624,7 @@ class QuantumHarmonicOscillator(QuantumSystem):
                 'norm': norm,
                 'passed': np.isclose(norm, 1.0, rtol=TOLERANCE_NORM)
             })
-        
+
         # Test orthogonality
         for n1 in range(min(5, n_max)):
             for n2 in range(n1+1, min(5, n_max)):
@@ -621,7 +636,7 @@ class QuantumHarmonicOscillator(QuantumSystem):
                     'overlap': overlap,
                     'passed': np.abs(overlap) < TOLERANCE_ORTHOGONAL
                 })
-        
+
         # Test energy spacing
         for n in range(n_max - 1):
             E_n = self.analytical_energy(n)
@@ -634,7 +649,7 @@ class QuantumHarmonicOscillator(QuantumSystem):
                 'expected': expected_spacing,
                 'passed': np.isclose(spacing, expected_spacing, rtol=1e-10)
             })
-        
+
         return results
 
     def __call__(self, x: np.ndarray, n: int) -> np.ndarray:
@@ -683,7 +698,7 @@ class TestQuantumHarmonicOscillator:
     def qho(self):
         """Fixture providing QHO instance"""
         return QuantumHarmonicOscillator()
-    
+
     @pytest.fixture
     def qho_fine_grid(self):
         """Fixture with fine grid for high-accuracy tests"""
@@ -708,7 +723,7 @@ class TestQuantumHarmonicOscillator:
             E_n = qho.analytical_energy(n)
             E_n1 = qho.analytical_energy(n+1)
             spacings.append(E_n1 - E_n)
-        
+
         expected_spacing = HBAR * qho.omega
         for i, spacing in enumerate(spacings):
             assert np.isclose(spacing, expected_spacing, rtol=1e-10), \
@@ -727,13 +742,13 @@ class TestQuantumHarmonicOscillator:
         """Test orthogonality between different states"""
         n_states = 10
         wavefunctions = []
-        
+
         for n in range(n_states):
             psi = qho_fine_grid.analytical_wavefunction(
                 qho_fine_grid.x_grid, n
             )
             wavefunctions.append(psi)
-        
+
         # Check all pairs
         for i in range(n_states):
             for j in range(i+1, n_states):
@@ -755,10 +770,10 @@ class TestQuantumHarmonicOscillator:
     def test_wavefunction_node_count(self, qho, n):
         """Test that ψ_n has exactly n nodes"""
         psi = qho.analytical_wavefunction(qho.x_grid, n)
-        
+
         # Count sign changes (nodes)
         sign_changes = np.sum(np.diff(np.sign(psi)) != 0)
-        
+
         # Allow ±1 due to numerical discretization
         assert abs(sign_changes - n) <= 1, \
             f"ψ_{n} has {sign_changes} nodes, expected {n}"
@@ -768,12 +783,12 @@ class TestQuantumHarmonicOscillator:
         """Compare numerical and analytical energy eigenvalues"""
         n_states = 10
         energies_num, _ = qho.solve_eigenvalue_problem(n_states)
-        
+
         for n in range(n_states):
             E_analytical = qho.analytical_energy(n)
             E_numerical = energies_num[n]
             rel_error = abs(E_numerical - E_analytical) / E_analytical
-            
+
             assert rel_error < 1e-4, \
                 f"n={n}: Numerical {E_numerical:.6f} vs " \
                 f"Analytical {E_analytical:.6f} (error: {rel_error:.2e})"
@@ -782,22 +797,22 @@ class TestQuantumHarmonicOscillator:
         """Compare numerical and analytical wavefunctions"""
         n_states = 5
         _, wavefunctions_num = qho.solve_eigenvalue_problem(n_states)
-        
+
         for n in range(n_states):
             psi_numerical = wavefunctions_num[n]
             psi_analytical = qho.analytical_wavefunction(qho.x_grid, n)
-            
+
             # Fix relative phase
             phase = np.sign(psi_numerical[len(psi_numerical)//2]) * \
                     np.sign(psi_analytical[len(psi_analytical)//2])
             psi_numerical *= phase
-            
+
             # Calculate overlap
             overlap = np.trapz(
-                psi_numerical * psi_analytical, 
+                psi_numerical * psi_analytical,
                 qho.x_grid
             )
-            
+
             assert overlap > 0.999, \
                 f"n={n}: Overlap = {overlap:.6f} (insufficient agreement)"
 
@@ -820,15 +835,15 @@ class TestQuantumHarmonicOscillator:
         """Test virial theorem: <T> = <V> for harmonic oscillator"""
         for n in range(5):
             psi = qho.analytical_wavefunction(qho.x_grid, n)
-            
+
             # Kinetic energy: <T> = -ℏ²/2m ∫ ψ d²ψ/dx²
             psi_xx = np.gradient(np.gradient(psi, qho.dx), qho.dx)
             T_mean = -HBAR**2 / (2 * qho.mass) * \
                      np.trapz(psi * psi_xx, qho.x_grid)
-            
+
             # Potential energy: <V> = ∫ ψ² V(x)
             V_mean = np.trapz(psi**2 * qho.potential(qho.x_grid), qho.x_grid)
-            
+
             assert np.isclose(T_mean, V_mean, rtol=1e-2), \
                 f"n={n}: <T>={T_mean:.6f}, <V>={V_mean:.6f} (virial violated)"
 
@@ -836,7 +851,7 @@ class TestQuantumHarmonicOscillator:
     def test_invalid_quantum_numbers(self, qho):
         """Test rejection of invalid quantum numbers"""
         invalid_numbers = [-1, -5, 3.5, "two", None, float('inf')]
-        
+
         for invalid_n in invalid_numbers:
             with pytest.raises((InvalidQuantumNumberError, TypeError)):
                 qho.analytical_energy(invalid_n)
@@ -859,13 +874,13 @@ class TestQuantumHarmonicOscillator:
             np.linspace(-10, 10, 512),
             np.linspace(-10, 10, 1024),
         ]
-        
+
         energies_list = []
         for grid in grids:
             qho_test = QuantumHarmonicOscillator(x_grid=grid)
             E, _ = qho_test.solve_eigenvalue_problem(n_states=5)
             energies_list.append(E)
-        
+
         # All grids should give similar results
         for i in range(len(energies_list)-1):
             max_diff = np.max(np.abs(
@@ -880,7 +895,7 @@ class TestQuantumHarmonicOscillator:
         """Benchmark eigenvalue solver performance"""
         def solve():
             return qho.solve_eigenvalue_problem(n_states=20)
-        
+
         result = benchmark(solve)
         # Should complete in reasonable time
         assert benchmark.stats.stats.mean < 1.0  # 1 second
@@ -899,25 +914,25 @@ Integration tests for complete computational physics workflows
 
 class TestCompleteWorkflows:
     """Test complete analysis workflows"""
-    
+
     def test_complete_eigenvalue_analysis(self):
         """Test complete workflow: create system → solve → validate"""
         # Setup
         qho = QuantumHarmonicOscillator()
-        
+
         # Solve
         energies, wavefunctions = qho.solve_eigenvalue_problem(n_states=10)
-        
+
         # Validate results
         assert len(energies) == 10
         assert wavefunctions.shape == (10, len(qho.x_grid))
-        
+
         # Check all energies are positive
         assert np.all(energies > 0)
-        
+
         # Check energy ordering
         assert np.all(np.diff(energies) > 0)
-        
+
         # Verify against analytical
         for n in range(10):
             E_analytical = qho.analytical_energy(n)
@@ -927,20 +942,20 @@ class TestCompleteWorkflows:
     def test_wavefunction_evolution_preparation(self):
         """Test preparing initial state for time evolution"""
         qho = QuantumHarmonicOscillator()
-        
+
         # Create Gaussian wave packet
         x0 = 2.0
         sigma = 1.0
         psi_0 = np.exp(-(qho.x_grid - x0)**2 / (2*sigma**2))
-        
+
         # Normalize
         norm = np.sqrt(np.trapz(np.abs(psi_0)**2, qho.x_grid))
         psi_0 /= norm
-        
+
         # Verify normalization
         final_norm = np.trapz(np.abs(psi_0)**2, qho.x_grid)
         assert np.isclose(final_norm, 1.0, rtol=1e-6)
-        
+
         # Check it's properly localized
         x_mean = np.trapz(np.abs(psi_0)**2 * qho.x_grid, qho.x_grid)
         assert np.abs(x_mean - x0) < 0.1
@@ -949,17 +964,17 @@ class TestCompleteWorkflows:
         """Test grid convergence analysis workflow"""
         grid_sizes = [64, 128, 256, 512]
         ground_energies = []
-        
+
         for N in grid_sizes:
             x_grid = np.linspace(-X_MAX, X_MAX, N)
             qho_test = QuantumHarmonicOscillator(x_grid=x_grid)
             E, _ = qho_test.solve_eigenvalue_problem(n_states=1)
             ground_energies.append(E[0])
-        
+
         # Check convergence: errors should decrease with grid size
         E_analytical = HBAR * OMEGA * 0.5
         errors = [abs(E - E_analytical) for E in ground_energies]
-        
+
         # Errors should generally decrease
         for i in range(len(errors)-1):
             # Allow some numerical noise
@@ -984,7 +999,7 @@ Following industry best practices
 def measure_coverage():
     """
     Measure test coverage for QHO module.
-    
+
     Best practices:
     - Aim for >90% coverage
     - Focus on critical paths
@@ -1032,24 +1047,24 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: ['3.10', '3.11', '3.12', '3.13']
-    
+
     steps:
     - uses: actions/checkout@v3
-    
+
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
-    
+
     - name: Install dependencies
       run: |
         pip install -e .
         pip install pytest pytest-cov hypothesis
-    
+
     - name: Run tests
       run: |
         pytest --cov=qho_toolkit --cov-report=xml
-    
+
     - name: Upload coverage
       uses: codecov/codecov-action@v3
       with:
@@ -1084,45 +1099,45 @@ Performance testing and benchmarking
 
 class TestPerformance:
     """Performance benchmarks for critical code paths"""
-    
+
     def test_benchmark_wavefunction_computation(self, benchmark, qho):
         """Benchmark analytical wavefunction computation"""
         def compute_wavefunction():
             return qho.analytical_wavefunction(qho.x_grid, 5)
-        
+
         result = benchmark(compute_wavefunction)
         assert result is not None
-    
+
     def test_benchmark_eigenvalue_solver(self, benchmark, qho):
         """Benchmark numerical eigenvalue solver"""
         def solve_eigen():
             return qho.solve_eigenvalue_problem(n_states=10)
-        
+
         result = benchmark(solve_eigen)
         energies, wavefunctions = result
         assert len(energies) == 10
-    
+
     def test_performance_scaling(self):
         """Test performance scaling with system size"""
         import time
-        
+
         sizes = [64, 128, 256, 512]
         times = []
-        
+
         for N in sizes:
             x_grid = np.linspace(-X_MAX, X_MAX, N)
             qho_test = QuantumHarmonicOscillator(x_grid=x_grid)
-            
+
             start = time.time()
             qho_test.solve_eigenvalue_problem(n_states=10)
             elapsed = time.time() - start
-            
+
             times.append(elapsed)
-        
+
         # Log results
         for N, t in zip(sizes, times):
             logger.info(f"N={N}: {t:.4f}s")
-        
+
         # Check scaling is reasonable (should be approximately O(N²))
         # Time should roughly quadruple when N doubles
         for i in range(len(times)-1):
@@ -1146,25 +1161,25 @@ from pstats import SortKey
 def profile_eigenvalue_solver():
     """Profile eigenvalue solver to find bottlenecks"""
     qho = QuantumHarmonicOscillator()
-    
+
     profiler = cProfile.Profile()
     profiler.enable()
-    
+
     # Run multiple times for better statistics
     for _ in range(10):
         qho.solve_eigenvalue_problem(n_states=20)
-    
+
     profiler.disable()
-    
+
     # Print statistics
     stats = pstats.Stats(profiler)
     stats.strip_dirs()
     stats.sort_stats(SortKey.CUMULATIVE)
-    
+
     print("\nProfiling Results (Top 10 functions):")
     print("=" * 80)
     stats.print_stats(10)
-    
+
     print("\nOptimization Opportunities:")
     print("  1. Look for functions called many times")
     print("  2. Identify expensive operations")
@@ -1193,15 +1208,15 @@ from pathlib import Path
 
 class RegressionTestData:
     """Manage regression test data"""
-    
+
     def __init__(self, data_dir: str = "./test_data"):
         self.data_dir = Path(data_dir)
         self.data_dir.mkdir(exist_ok=True)
-    
+
     def save_reference(self, test_name: str, data: Dict[str, Any]):
         """Save reference data for regression testing"""
         file_path = self.data_dir / f"{test_name}.json"
-        
+
         # Convert numpy arrays to lists for JSON serialization
         serializable_data = {}
         for key, value in data.items():
@@ -1209,50 +1224,50 @@ class RegressionTestData:
                 serializable_data[key] = value.tolist()
             else:
                 serializable_data[key] = value
-        
+
         with open(file_path, 'w') as f:
             json.dump(serializable_data, f, indent=2)
-        
+
         logger.info(f"Saved reference data: {test_name}")
-    
+
     def load_reference(self, test_name: str) -> Dict[str, Any]:
         """Load reference data for comparison"""
         file_path = self.data_dir / f"{test_name}.json"
-        
+
         if not file_path.exists():
             raise FileNotFoundError(f"Reference data not found: {test_name}")
-        
+
         with open(file_path, 'r') as f:
             data = json.load(f)
-        
+
         # Convert lists back to numpy arrays
         for key, value in data.items():
             if isinstance(value, list):
                 data[key] = np.array(value)
-        
+
         return data
 
 class TestRegression:
     """Regression tests to prevent breaking changes"""
-    
+
     @pytest.fixture
     def regression_data(self):
         """Fixture for regression test data"""
         return RegressionTestData()
-    
+
     def test_ground_state_energy_regression(self, qho, regression_data):
         """Ensure ground state energy hasn't changed"""
         E_0 = qho.analytical_energy(0)
-        
+
         reference = {
             'energy': float(E_0),
             'mass': qho.mass,
             'omega': qho.omega
         }
-        
+
         # Uncomment to save new reference:
         # regression_data.save_reference('ground_state_energy', reference)
-        
+
         # Load and compare
         try:
             ref_data = regression_data.load_reference('ground_state_energy')
@@ -1260,17 +1275,17 @@ class TestRegression:
                 f"Ground state energy changed: {E_0} vs {ref_data['energy']}"
         except FileNotFoundError:
             pytest.skip("No reference data available")
-    
+
     def test_wavefunction_shape_regression(self, qho):
         """Ensure wavefunction output shape hasn't changed"""
         psi_0 = qho.analytical_wavefunction(qho.x_grid, 0)
-        
+
         # Shape should match grid
         assert psi_0.shape == qho.x_grid.shape
-        
+
         # Should be 1D array
         assert psi_0.ndim == 1
-        
+
         # Should have expected length
         assert len(psi_0) == N_POINTS
 
@@ -1307,14 +1322,14 @@ SYSTEM_PARAMETERS = [
 
 class TestDataDriven:
     """Data-driven tests with multiple parameter sets"""
-    
+
     @pytest.mark.parametrize("n,expected_ratio,tol", ENERGY_TEST_DATA)
     def test_energy_parametrized(self, qho, n, expected_ratio, tol):
         """Test energy for multiple quantum numbers"""
         E_n = qho.analytical_energy(n)
         expected = expected_ratio * HBAR * qho.omega
         assert np.isclose(E_n, expected, rtol=tol)
-    
+
     @pytest.mark.parametrize("mass,omega,n_points", SYSTEM_PARAMETERS)
     def test_different_system_parameters(self, mass, omega, n_points):
         """Test QHO with various physical parameters"""
@@ -1322,15 +1337,15 @@ class TestDataDriven:
         qho_test = QuantumHarmonicOscillator(
             mass=mass, omega=omega, x_grid=x_grid
         )
-        
+
         # Solve and validate
         E, psi = qho_test.solve_eigenvalue_problem(n_states=5)
-        
+
         # Basic checks
         assert len(E) == 5
         assert np.all(E > 0)
         assert np.all(np.diff(E) > 0)
-        
+
         # Check against analytical
         for n in range(5):
             E_analytical = HBAR * omega * (n + 0.5)
@@ -1354,18 +1369,18 @@ Concept: introduce bugs to see if tests catch them
 def demonstrate_mutation_testing():
     """
     Mutation testing validates test suite effectiveness.
-    
+
     Process:
     1. Mutate code (introduce bugs)
     2. Run tests
     3. Check if tests fail (they should!)
-    
+
     Common mutations:
     - Change operators: + to -, * to /
     - Change constants: 0.5 to 0.6
     - Remove lines
     - Change comparison operators
-    
+
     Tools:
     - mutmut: Python mutation testing
     - cosmic-ray: Another mutation testing tool
@@ -1406,69 +1421,69 @@ from scipy import integrate
 
 class ValidatedIntegration:
     """Integration methods with comprehensive error checking"""
-    
+
     @staticmethod
     def adaptive_quadrature(
-        func: Callable, 
-        a: float, 
+        func: Callable,
+        a: float,
         b: float,
         tol: float = 1e-8,
         max_subdivisions: int = 50
     ) -> Tuple[float, float, Dict]:
         """
         Adaptive quadrature with error estimation.
-        
+
         Returns:
             result: Integral value
             error: Estimated error
             info: Diagnostic information
         """
         result, error = integrate.quad(
-            func, a, b, 
-            epsabs=tol, 
+            func, a, b,
+            epsabs=tol,
             epsrel=tol,
             limit=max_subdivisions
         )
-        
+
         info = {
             'method': 'adaptive_quadrature',
             'tolerance': tol,
             'estimated_error': error,
             'converged': error < tol
         }
-        
+
         if not info['converged']:
             logger.warning(
                 f"Integration may not have converged: error={error:.2e}"
             )
-        
+
         return result, error, info
-    
+
     @staticmethod
     def test_integration_accuracy():
         """Test integration on known problems"""
         # Test 1: Simple polynomial
         def f1(x):
             return x**2
-        
+
         result, error, _ = ValidatedIntegration.adaptive_quadrature(
             f1, 0, 1
         )
         expected = 1/3
         assert np.isclose(result, expected, atol=1e-10), \
             f"∫x² dx failed: {result} vs {expected}"
-        
+
         # Test 2: Exponential
         def f2(x):
             return np.exp(-x)
-        
+
         result, error, _ = ValidatedIntegration.adaptive_quadrature(
             f2, 0, np.inf
         )
         expected = 1.0
         assert np.isclose(result, expected, atol=1e-8), \
             f"∫e^(-x) dx failed: {result} vs {expected}"
-        
+
         logger.info("✓ Integration validation passed")
 
 # Run validation
@@ -1487,78 +1502,78 @@ Time evolution with comprehensive error checking and validation
 
 class ValidatedTimePropagator:
     """Base class for time propagators with validation"""
-    
+
     def __init__(self, system: QuantumSystem, dt: float):
         self.system = system
         self.dt = dt
         self._validate_timestep()
-    
+
     def _validate_timestep(self):
         """Validate time step is appropriate"""
         # Estimate maximum frequency
         omega_max = np.sqrt(
-            2 * np.max(self.system.potential(self.system.x_grid)) / 
+            2 * np.max(self.system.potential(self.system.x_grid)) /
             self.system.mass
         )
-        
+
         # Nyquist criterion
         dt_max = np.pi / omega_max if omega_max > 0 else np.inf
-        
+
         if self.dt > dt_max:
             logger.warning(
                 f"Time step dt={self.dt:.4f} may be too large. "
                 f"Consider dt < {dt_max:.4f}"
             )
-    
+
     def validate_evolution(
-        self, 
+        self,
         psi_initial: np.ndarray,
         psi_final: np.ndarray
     ) -> Dict[str, bool]:
         """
         Validate time evolution preserves quantum properties.
-        
+
         Returns:
             Dictionary of validation results
         """
         results = {}
-        
+
         # Check norm conservation
         norm_initial = np.trapz(
-            np.abs(psi_initial)**2, 
+            np.abs(psi_initial)**2,
             self.system.x_grid
         )
         norm_final = np.trapz(
-            np.abs(psi_final)**2, 
+            np.abs(psi_final)**2,
             self.system.x_grid
         )
-        
+
         results['norm_conserved'] = np.isclose(
-            norm_initial, norm_final, 
+            norm_initial, norm_final,
             rtol=1e-6
         )
-        
+
         if not results['norm_conserved']:
             logger.warning(
                 f"Norm not conserved: {norm_initial:.6f} → {norm_final:.6f}"
             )
-        
+
         # Check energy conservation (for time-independent Hamiltonian)
         H = self.system.get_hamiltonian_matrix()
-        
+
         E_initial = np.vdot(psi_initial, H @ psi_initial).real * self.system.dx
         E_final = np.vdot(psi_final, H @ psi_final).real * self.system.dx
-        
+
         results['energy_conserved'] = np.isclose(
             E_initial, E_final,
             rtol=1e-4
         )
-        
+
         if not results['energy_conserved']:
             logger.warning(
                 f"Energy not conserved: {E_initial:.6f} → {E_final:.6f}"
             )
-        
+
         return results
 
 class SplitStepPropagator(ValidatedTimePropagator):
@@ -1586,30 +1601,30 @@ class SplitStepPropagator(ValidatedTimePropagator):
         """Evolve wavefunction by one time step"""
         # V/2
         psi = self.exp_V_half * psi
-        
+
         # FFT to momentum space
         psi_k = np.fft.fft(psi)
-        
+
         # Apply kinetic operator
         psi_k = self.exp_T * psi_k
-        
+
         # IFFT back
         psi = np.fft.ifft(psi_k)
-        
+
         # V/2
         psi = self.exp_V_half * psi
-        
+
         return psi
 
     def evolve(
-        self, 
-        psi_0: np.ndarray, 
+        self,
+        psi_0: np.ndarray,
         t_max: float,
         validate_interval: int = 100
     ) -> Tuple[np.ndarray, np.ndarray, List[Dict]]:
         """
         Evolve with periodic validation.
-        
+
         Returns:
             times: Time array
             psi_t: Wavefunction evolution
@@ -1623,18 +1638,18 @@ class SplitStepPropagator(ValidatedTimePropagator):
 
         validation_results = []
         psi = psi_0.copy()
-        
+
         for i in range(1, n_steps):
             psi = self.step(psi)
             psi_t[i] = psi
-            
+
             # Periodic validation
             if i % validate_interval == 0:
                 validation = self.validate_evolution(psi_0, psi)
                 validation['step'] = i
                 validation['time'] = times[i]
                 validation_results.append(validation)
-                
+
                 if not all(validation.values()):
                     logger.warning(f"Validation failed at step {i}")
 
@@ -1655,7 +1670,7 @@ Comprehensive tests for time evolution
 
 class TestTimeEvolution:
     """Test suite for time propagation methods"""
-    
+
     @pytest.fixture
     def simple_gaussian(self, qho):
         """Fixture: Gaussian wave packet"""
@@ -1664,49 +1679,49 @@ class TestTimeEvolution:
         psi = np.exp(-(qho.x_grid - x0)**2 / (2*sigma**2))
         norm = np.sqrt(np.trapz(np.abs(psi)**2, qho.x_grid))
         return psi / norm
-    
+
     def test_stationary_state_evolution(self, qho):
         """Test that stationary states don't evolve (except phase)"""
         # Use ground state
         psi_0 = qho.analytical_wavefunction(qho.x_grid, 0)
-        
+
         # Evolve for short time
         propagator = SplitStepPropagator(qho, dt=0.01)
         times, psi_t, _ = propagator.evolve(psi_0, t_max=1.0)
-        
+
         # Probability distribution shouldn't change
         prob_initial = np.abs(psi_0)**2
         prob_final = np.abs(psi_t[-1])**2
-        
+
         max_diff = np.max(np.abs(prob_initial - prob_final))
         assert max_diff < 1e-6, \
             f"Stationary state evolved: max diff = {max_diff}"
-    
+
     def test_norm_conservation_long_evolution(self, qho, simple_gaussian):
         """Test norm conservation over long time"""
         propagator = SplitStepPropagator(qho, dt=0.01)
         times, psi_t, validations = propagator.evolve(
-            simple_gaussian, 
+            simple_gaussian,
             t_max=10.0,
             validate_interval=50
         )
-        
+
         # Check all validations passed
         for val in validations:
             assert val['norm_conserved'], \
                 f"Norm not conserved at t={val['time']:.2f}"
-    
+
     def test_energy_conservation(self, qho, simple_gaussian):
         """Test energy conservation for time-independent Hamiltonian"""
         propagator = SplitStepPropagator(qho, dt=0.01)
         H = qho.get_hamiltonian_matrix()
-        
+
         # Initial energy
         E_0 = np.vdot(simple_gaussian, H @ simple_gaussian).real * qho.dx
-        
+
         # Evolve
         times, psi_t, _ = propagator.evolve(simple_gaussian, t_max=5.0)
-        
+
         # Check energy at several times
         for i in [len(times)//4, len(times)//2, 3*len(times)//4, -1]:
             psi = psi_t[i]
@@ -1715,28 +1730,28 @@ class TestTimeEvolution:
             assert rel_error < 1e-3, \
                 f"Energy not conserved at t={times[i]:.2f}: " \
                 f"rel_error={rel_error:.2e}"
-    
+
     def test_time_reversal_symmetry(self, qho, simple_gaussian):
         """Test time reversal symmetry"""
         propagator_forward = SplitStepPropagator(qho, dt=0.01)
         propagator_backward = SplitStepPropagator(qho, dt=-0.01)
-        
+
         # Forward evolution
         psi_forward = simple_gaussian.copy()
         for _ in range(100):
             psi_forward = propagator_forward.step(psi_forward)
-        
+
         # Backward evolution
         psi_backward = psi_forward.copy()
         for _ in range(100):
             psi_backward = propagator_backward.step(psi_backward)
-        
+
         # Should return to initial state
         overlap = np.abs(np.trapz(
             psi_backward.conj() * simple_gaussian,
             qho.x_grid
         ))
-        
+
         assert overlap > 0.99, \
             f"Time reversal failed: overlap = {overlap:.4f}"
 
@@ -1771,7 +1786,7 @@ class ValidatedQuantumNeuralNetwork(nn.Module):
 
     def __init__(self, hidden_layers: List[int] = [64, 64, 64]):
         super().__init__()
-        
+
         layers = []
         input_size = 1
 
@@ -1785,7 +1800,7 @@ class ValidatedQuantumNeuralNetwork(nn.Module):
 
         self.network = nn.Sequential(*layers)
         self._initialize_weights()
-    
+
     def _initialize_weights(self):
         """Initialize weights with Xavier initialization"""
         for m in self.modules():
@@ -1795,7 +1810,7 @@ class ValidatedQuantumNeuralNetwork(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.network(x)
-    
+
     def count_parameters(self) -> int:
         """Count trainable parameters"""
         return sum(p.numel() for p in self.parameters() if p.requires_grad)
@@ -1806,10 +1821,10 @@ class TestablePINNSolver:
     """
 
     def __init__(
-        self, 
-        potential_func: Callable, 
+        self,
+        potential_func: Callable,
         x_domain: Tuple[float, float],
-        mass: float = MASS, 
+        mass: float = MASS,
         device: str = 'cpu'
     ):
         self.potential_func = potential_func
@@ -1819,11 +1834,11 @@ class TestablePINNSolver:
 
         self.network = ValidatedQuantumNeuralNetwork().to(device)
         self.energy = nn.Parameter(torch.tensor([0.5], device=device))
-        
+
         # Loss weights
         self.lambda_bc = 100.0
         self.lambda_norm = 10.0
-        
+
         # Training history for analysis
         self.history = {
             'loss': [],
@@ -1875,10 +1890,10 @@ class TestablePINNSolver:
         return (norm - 1.0)**2
 
     def train(
-        self, 
-        n_epochs: int = 5000, 
+        self,
+        n_epochs: int = 5000,
         n_points: int = 256,
-        lr: float = 0.001, 
+        lr: float = 0.001,
         verbose: int = 500,
         early_stopping: bool = True,
         patience: int = 100
@@ -1887,7 +1902,7 @@ class TestablePINNSolver:
         Train with early stopping and validation.
         """
         optimizer = optim.Adam(
-            list(self.network.parameters()) + [self.energy], 
+            list(self.network.parameters()) + [self.energy],
             lr=lr
         )
 
@@ -1899,7 +1914,7 @@ class TestablePINNSolver:
 
         x_boundary = torch.tensor(
             [[self.x_min], [self.x_max]],
-            dtype=torch.float32, 
+            dtype=torch.float32,
             device=self.device
         )
 
@@ -1933,7 +1948,7 @@ class TestablePINNSolver:
                     patience_counter = 0
                 else:
                     patience_counter += 1
-                
+
                 if patience_counter >= patience:
                     logger.info(f"Early stopping at epoch {epoch+1}")
                     break
@@ -1954,72 +1969,72 @@ class TestablePINNSolver:
                 x, dtype=torch.float32, device=self.device
             ).reshape(-1, 1)
             psi = self.network(x_tensor).cpu().numpy().flatten()
-        
+
         # Normalize
         norm = np.sqrt(np.trapz(psi**2, x))
         return psi / norm
 
 class TestPINN:
     """Test suite for Physics-Informed Neural Networks"""
-    
+
     def test_pinn_architecture(self):
         """Test PINN network architecture"""
         network = ValidatedQuantumNeuralNetwork([32, 32])
-        
+
         # Test forward pass
         x = torch.randn(10, 1)
         output = network(x)
-        
+
         assert output.shape == (10, 1)
         assert not torch.isnan(output).any()
         assert not torch.isinf(output).any()
-    
+
     def test_pinn_gradients(self):
         """Test that gradients flow correctly"""
         network = ValidatedQuantumNeuralNetwork()
         x = torch.randn(5, 1, requires_grad=True)
-        
+
         output = network(x)
         output.sum().backward()
-        
+
         # Check gradients exist
         assert x.grad is not None
         for param in network.parameters():
             assert param.grad is not None
-    
+
     def test_pinn_convergence_simple(self):
         """Test PINN converges for simple harmonic oscillator"""
         qho = QuantumHarmonicOscillator()
         pinn = TestablePINNSolver(qho.potential, (-6, 6))
-        
+
         # Train
         history = pinn.train(n_epochs=1000, n_points=128, verbose=10000)
-        
+
         # Check convergence
         final_loss = history['loss'][-1]
         assert final_loss < 0.01, f"PINN didn't converge: loss={final_loss}"
-        
+
         # Check energy accuracy
         E_pinn = pinn.energy.item()
         E_exact = qho.analytical_energy(0)
         rel_error = abs(E_pinn - E_exact) / E_exact
-        
+
         assert rel_error < 0.05, \
             f"Energy error too large: {rel_error:.2%}"
-    
+
     def test_pinn_wavefunction_properties(self):
         """Test PINN wavefunction satisfies quantum properties"""
         qho = QuantumHarmonicOscillator()
         pinn = TestablePINNSolver(qho.potential, (-6, 6))
         pinn.train(n_epochs=500, verbose=10000)
-        
+
         x_test = np.linspace(-6, 6, 200)
         psi_pinn = pinn.predict(x_test)
-        
+
         # Test normalization
         norm = np.trapz(psi_pinn**2, x_test)
         assert np.isclose(norm, 1.0, rtol=1e-2)
-        
+
         # Test symmetry (ground state should be even)
         psi_left = psi_pinn[x_test < 0]
         psi_right = psi_pinn[x_test > 0][::-1]
@@ -2047,21 +2062,21 @@ Double-well potential with full test coverage
 class DoubleWellPotential(QuantumSystem):
     """
     Double-well: V(x) = λ(x² - a²)²
-    
+
     Includes validation and testing utilities.
     """
 
     def __init__(
-        self, 
-        a: float = 2.0, 
+        self,
+        a: float = 2.0,
         lambda_param: float = 0.1,
-        mass: float = MASS, 
+        mass: float = MASS,
         x_grid: Optional[np.ndarray] = None
     ):
         super().__init__(mass, x_grid)
         self.a = a
         self.lambda_param = lambda_param
-        
+
         # Validation
         if a <= 0:
             raise ValueError(f"Well separation must be positive: a={a}")
@@ -2075,7 +2090,7 @@ class DoubleWellPotential(QuantumSystem):
     def barrier_height(self) -> float:
         """Calculate barrier height at x=0"""
         return self.potential(np.array([0.0]))[0]
-    
+
     def well_minima(self) -> Tuple[float, float]:
         """Return positions of well minima"""
         return (-self.a, self.a)
@@ -2094,67 +2109,67 @@ class DoubleWellPotential(QuantumSystem):
 
 class TestDoubleWell:
     """Test suite for double-well potential"""
-    
+
     def test_potential_shape(self):
         """Test potential has correct shape"""
         dw = DoubleWellPotential(a=2.0, lambda_param=0.1)
         x = np.linspace(-5, 5, 100)
         V = dw.potential(x)
-        
+
         # Should have minima at ±a
         minima_indices = np.where(
             (V[1:-1] < V[:-2]) & (V[1:-1] < V[2:])
         )[0] + 1
-        
+
         assert len(minima_indices) == 2, "Should have exactly 2 minima"
-        
+
         # Check positions approximately at ±a
         x_minima = x[minima_indices]
         assert np.abs(x_minima[0] + dw.a) < 0.5
         assert np.abs(x_minima[1] - dw.a) < 0.5
-    
+
     def test_barrier_height(self):
         """Test barrier height calculation"""
         lambda_param = 0.1
         a = 2.0
         dw = DoubleWellPotential(a=a, lambda_param=lambda_param)
-        
+
         barrier = dw.barrier_height()
         expected = lambda_param * a**4
-        
+
         assert np.isclose(barrier, expected, rtol=1e-10)
-    
+
     def test_tunneling_splitting(self):
         """Test tunneling splitting between ground states"""
         dw = DoubleWellPotential(a=2.0, lambda_param=0.1)
         energies, wavefunctions = dw.solve_eigenvalue_problem(n_states=10)
-        
+
         # First two states should be split by tunneling
         E0, E1 = energies[0], energies[1]
         splitting = E1 - E0
-        
+
         # Splitting should be positive and small
         assert splitting > 0
         assert splitting < E0  # Much smaller than ground energy
-        
+
         logger.info(f"Tunneling splitting: ΔE = {splitting:.6f}")
-    
+
     def test_wavefunction_symmetry(self):
         """Test symmetric/antisymmetric wavefunctions"""
         dw = DoubleWellPotential(a=2.0, lambda_param=0.1)
         _, wavefunctions = dw.solve_eigenvalue_problem(n_states=2)
-        
+
         psi_0, psi_1 = wavefunctions[0], wavefunctions[1]
-        
+
         # Test symmetry under x → -x
         x_grid = dw.x_grid
         psi_0_reflected = np.flip(psi_0)
         psi_1_reflected = np.flip(psi_1)
-        
+
         # Ground state should be symmetric
         symmetric_error_0 = np.mean(np.abs(psi_0 - psi_0_reflected))
         assert symmetric_error_0 < 0.1, f"ψ_0 not symmetric: {symmetric_error_0}"
-        
+
         # First excited should be antisymmetric
         antisymmetric_error_1 = np.mean(np.abs(psi_1 + psi_1_reflected))
         assert antisymmetric_error_1 < 0.1, f"ψ_1 not antisymmetric"
@@ -2174,15 +2189,15 @@ Automated test reporting and documentation
 
 class TestReportGenerator:
     """Generate comprehensive test reports"""
-    
+
     def __init__(self, output_dir: str = "./test_reports"):
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(exist_ok=True)
-    
+
     def generate_coverage_report(self):
         """Generate HTML coverage report"""
         report_path = self.output_dir / "coverage"
-        
+
         print(f"Coverage Report Generator")
         print("=" * 60)
         print(f"\nTo generate coverage report:")
@@ -2190,28 +2205,28 @@ class TestReportGenerator:
         print(f"         --cov-report=html:{report_path} \\")
         print(f"         --cov-report=term-missing")
         print(f"\nReport will be saved to: {report_path}/index.html")
-    
+
     def generate_test_summary(self, test_results: Dict) -> str:
         """Generate markdown test summary"""
         summary = ["# Test Summary Report\n"]
         summary.append(f"Generated: {pd.Timestamp.now()}\n\n")
-        
+
         summary.append("## Test Statistics\n\n")
         summary.append(f"- Total tests: {test_results.get('total', 0)}\n")
         summary.append(f"- Passed: {test_results.get('passed', 0)}\n")
         summary.append(f"- Failed: {test_results.get('failed', 0)}\n")
         summary.append(f"- Skipped: {test_results.get('skipped', 0)}\n\n")
-        
+
         if test_results.get('failed', 0) > 0:
             summary.append("## ⚠️ Failed Tests\n\n")
             for failure in test_results.get('failures', []):
                 summary.append(f"- {failure}\n")
-        
+
         summary.append("\n## Coverage\n\n")
         summary.append(f"- Statement coverage: {test_results.get('coverage', 0):.1f}%\n")
-        
+
         return "".join(summary)
-    
+
     def save_report(self, content: str, filename: str = "test_summary.md"):
         """Save report to file"""
         file_path = self.output_dir / filename
@@ -2253,7 +2268,7 @@ Comprehensive testing checklist for computational physics
 
 def print_testing_checklist():
     """Display testing best practices checklist"""
-    
+
     checklist = """
 COMPREHENSIVE TESTING CHECKLIST FOR COMPUTATIONAL PHYSICS
 ═══════════════════════════════════════════════════════════
@@ -2322,12 +2337,12 @@ COMPREHENSIVE TESTING CHECKLIST FOR COMPUTATIONAL PHYSICS
   ✓ Use containerization (Docker)
   ✓ Version control everything
 """
-    
+
     print(checklist)
-    
+
     print("\nTESTING TOOLS ECOSYSTEM")
     print("─" * 60)
-    
+
     tools = {
         "Test Framework": "pytest",
         "Coverage": "coverage.py / pytest-cov",
@@ -2340,10 +2355,10 @@ COMPREHENSIVE TESTING CHECKLIST FOR COMPUTATIONAL PHYSICS
         "CI/CD": "GitHub Actions / GitLab CI",
         "Documentation": "sphinx / mkdocs"
     }
-    
+
     for category, tool in tools.items():
         print(f"  {category:20} → {tool}")
-    
+
     print("\n" + "=" * 60)
 
 print_testing_checklist()
@@ -2361,15 +2376,15 @@ Final summary: What we've accomplished
 
 def print_masterclass_summary():
     """Print comprehensive summary"""
-    
+
     print("\n")
     print("=" * 70)
     print(" " * 10 + "QUANTUM HARMONIC OSCILLATOR MASTERCLASS")
     print(" " * 5 + "WITH COMPREHENSIVE TESTING & QUALITY ASSURANCE")
     print("=" * 70)
-    
+
     print("\n📚 WHAT YOU'VE MASTERED:\n")
-    
+
     achievements = {
         "Part I: Python Ecosystem with TDD": [
             "Environment setup with testing infrastructure",
@@ -2412,16 +2427,16 @@ def print_masterclass_summary():
             "Documentation testing"
         ]
     }
-    
+
     for section, items in achievements.items():
         print(f"\n{section}")
         print("-" * 70)
         for item in items:
             print(f"  ✓ {item}")
-    
+
     print("\n" + "=" * 70)
     print("\n🎯 KEY METRICS ACHIEVED:\n")
-    
+
     metrics = [
         ("Test Coverage", ">90%", "Statement, branch, function"),
         ("Test Count", "50+", "Unit, integration, property-based"),
@@ -2432,13 +2447,13 @@ def print_masterclass_summary():
         ("CI/CD", "Automated", "Multi-platform, multi-version"),
         ("Performance", "Optimized", "Profiled, benchmarked")
     ]
-    
+
     for metric, value, notes in metrics:
         print(f"  {metric:20} → {value:15} ({notes})")
-    
+
     print("\n" + "=" * 70)
     print("\n🚀 NEXT STEPS FOR ADVANCED LEARNING:\n")
-    
+
     next_steps = [
         "1. Extend to higher dimensions (2D/3D quantum systems)",
         "2. Implement many-body quantum mechanics",
@@ -2449,13 +2464,13 @@ def print_masterclass_summary():
         "7. Publish reproducible research papers",
         "8. Deploy production systems with FastAPI/Docker"
     ]
-    
+
     for step in next_steps:
         print(f"  {step}")
-    
+
     print("\n" + "=" * 70)
     print("\n💡 PROFESSIONAL DEVELOPMENT:\n")
-    
+
     skills = [
         "✓ Write production-quality scientific code",
         "✓ Implement comprehensive test suites",
@@ -2466,13 +2481,13 @@ def print_masterclass_summary():
         "✓ Document and share reproducible research",
         "✓ Optimize code for performance"
     ]
-    
+
     for skill in skills:
         print(f"  {skill}")
-    
+
     print("\n" + "=" * 70)
     print("\n📖 RECOMMENDED RESOURCES:\n")
-    
+
     resources = {
         "Books": [
             "- 'Computational Physics' by Newman",
@@ -2492,12 +2507,12 @@ def print_masterclass_summary():
             "- Mentor others in testing practices"
         ]
     }
-    
+
     for category, items in resources.items():
         print(f"\n{category}:")
         for item in items:
             print(f"  {item}")
-    
+
     print("\n" + "=" * 70)
     print("\n🎓 CERTIFICATE OF COMPLETION:\n")
     print("  You have successfully completed:")
@@ -2509,7 +2524,7 @@ def print_masterclass_summary():
     print("  ✓ Implement state-of-the-art numerical methods")
     print("  ✓ Apply machine learning to physics problems")
     print("  ✓ Lead computational physics projects")
-    
+
     print("\n" + "=" * 70)
     print("\n🙏 THANK YOU FOR YOUR DEDICATION!")
     print("\n  Keep computing, keep testing, keep learning!")
@@ -2533,10 +2548,10 @@ Master test runner script
 def run_complete_test_suite():
     """
     Run complete test suite with all options.
-    
+
     This script demonstrates how to run the full test battery.
     """
-    
+
     test_commands = """
 COMPLETE TEST SUITE EXECUTION GUIDE
 ═══════════════════════════════════════════════════════════
@@ -2594,9 +2609,9 @@ COMPLETE TEST SUITE EXECUTION GUIDE
 
 ═══════════════════════════════════════════════════════════
 """
-    
+
     print(test_commands)
-    
+
     print("\nQUICK START:")
     print("  # Install dependencies")
     print("  pip install pytest pytest-cov pytest-benchmark hypothesis pytest-xdist")
@@ -2658,10 +2673,10 @@ skip_covered = False
 [coverage:html]
 directory = htmlcov
 """
-    
+
     with open("pytest.ini", "w") as f:
         f.write(config)
-    
+
     print("✓ Generated: pytest.ini")
 
 def generate_pyproject_toml():
@@ -2720,10 +2735,10 @@ line-length = 88
 select = ["E", "F", "I", "N", "W"]
 ignore = []
 """
-    
+
     with open("pyproject.toml", "w") as f:
         f.write(config)
-    
+
     print("✓ Generated: pyproject.toml")
 
 # Generate configuration files
