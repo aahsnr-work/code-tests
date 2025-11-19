@@ -33,6 +33,7 @@
           seaborn
           debugpy
           pytest
+          biopython
         ];
 
         # TeX packages from default.nix
@@ -57,8 +58,8 @@
 
         devTools = with pkgs; [
           basedpyright
-          ruff
           tex
+          ruff
         ];
       in
       {

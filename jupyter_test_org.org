@@ -1,6 +1,6 @@
 #+TITLE: Jupyter Integration Test Suite for Doom Emacs
 #+AUTHOR: Test Suite
-#+PROPERTY: header-args:jupyter-python :session py :kernel python3 :async yes
+#+PROPERTY: header-args:jupyter-python
 
 * Setup Instructions
 
@@ -12,7 +12,7 @@ Before running these tests:
 
 * Test 1: Basic Execution and Environment Verification
 
-#+begin_src jupyter-python :session py
+#+begin_src python
 import sys
 import platform
 
@@ -25,37 +25,15 @@ print(f"Platform: {platform.platform()}")
 print(f"Architecture: {platform.machine()}")
 print("=" * 60)
 #+end_src
-:END:
-#+RESULTS:
-: ============================================================
-: ENVIRONMENT INFORMATION
-: ============================================================
-: Python Version: 3.13.7 (main, Sep  9 2025, 16:20:24) [GCC 15.2.1 20250813]
-: Python Executable: /usr/bin/python
-: Platform: Linux-6.17.7-5-cachyos-x86_64-with-glibc2.42
-: Architecture: x86_64
-: ============================================================
-
-#+RESULTS:
-
-: ============================================================
-: ENVIRONMENT INFORMATION
-: ============================================================
-: Python Version: 3.13.8 (main, Oct  7 2025, 12:01:51) [GCC 14.3.0]
-: Python Executable: /nix/store/cfapjd2rvqrpry4grb0kljnp8bvnvfxz-python3-3.13.8/bin/python
-: Platform: Linux-6.17.7-5-cachyos-x86_64-with-glibc2.40
-: Architecture: x86_64
-: ============================================================
 
 * Test 2: Package Availability Check
 
-#+begin_src jupyter-python :results output
+#+begin_src jupyter-python :session py
 """Test that all required packages from flake.nix are available"""
-
 required_packages = [
     'numpy', 'scipy', 'pandas', 'sklearn',
     'matplotlib', 'seaborn', 'ipywidgets',
-    'debugpy', 'ruff', 'mypy'
+    'debugpy', 'biopython'
 ]
 
 print("=" * 60)
@@ -92,10 +70,9 @@ PACKAGE AVAILABILITY CHECK
 ✓ seaborn         - Available
 ✓ ipywidgets      - Available
 ✓ debugpy         - Available
-✗ ruff            - MISSING
-✗ mypy            - MISSING
+✗ biopython       - MISSING
 ============================================================
-⚠ Missing packages: ruff, mypy
+⚠ Missing packages: biopython
 ============================================================
 #+end_example
 
