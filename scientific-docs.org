@@ -121,21 +121,6 @@ logger.info(f"  SciPy version: {sp.__version__}")
 logger.info(f"  pytest available for testing")
 #+end_src
 
-#+RESULTS:
-:RESULTS:
-# [goto error]
-: [31m---------------------------------------------------------------------------[39m
-: [31mModuleNotFoundError[39m                       Traceback (most recent call last)
-: [36mCell[39m[36m [39m[32mIn[1][39m[32m, line 19[39m
-: [32m     16[39m [38;5;28;01mimport[39;00m[38;5;250m [39m[34;01mlogging[39;00m
-: [32m     18[39m [38;5;66;03m# Testing imports[39;00m
-: [32m---> [39m[32m19[39m [38;5;28;01mimport[39;00m[38;5;250m [39m[34;01mpytest[39;00m
-: [32m     20[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mhypothesis[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m given, strategies [38;5;28;01mas[39;00m st, settings
-: [32m     21[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mhypothesis[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m assume, note
-:
-: [31mModuleNotFoundError[39m: No module named 'pytest'
-:END:
-
 *** Custom Exceptions with Validation and Testing
 
 #+begin_src python
