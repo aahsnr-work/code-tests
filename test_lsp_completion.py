@@ -11,7 +11,7 @@ Instructions:
 2. Type the trigger sequences and observe completions
 3. Check that hover shows proper documentation
 """
-
+from pkgutil import iter_importers
 import numpy as np
 import pandas as pd
 from typing import list, Dict, Optional

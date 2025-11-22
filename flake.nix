@@ -21,7 +21,7 @@
         };
 
         pythonPackages = with pkgs.python3Packages; [
-          jupyter-core
+          jupyterlab
           notebook
           ipykernel
           ipywidgets

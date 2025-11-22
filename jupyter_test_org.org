@@ -1,6 +1,6 @@
 #+TITLE: Jupyter Integration Test Suite for Doom Emacs
 #+AUTHOR: Test Suite
-#+PROPERTY: header-args:python :tangle jupyter_test_org.py
+#+PROPERTY: header-args:jupyter-python :session py :tangle jupyter_test_org.py
 
 * Setup Instructions
 
@@ -27,18 +27,11 @@ print("=" * 60)
 #+end_src
 
 #+RESULTS:
-: ============================================================
-: ENVIRONMENT INFORMATION
-: ============================================================
-: Python Version: 3.13.9 (main, Oct 14 2025, 13:52:31) [GCC 14.3.0]
-: Python Executable: /nix/store/7gl4khq26h625mpqzkiiqsify3hclar1-python3-3.13.9/bin/python
-: Platform: Linux-6.17.8-2-cachyos-x86_64-with-glibc2.40
-: Architecture: x86_64
-: ============================================================
+: None
 
 * Test 2: Package Availability Check
 
-#+begin_src python
+#+begin_src jupyter-python :session py :tangle jupyter_test_org.py
 """Test that all required packages from flake.nix are available"""
 required_packages = [
     'scipy', 'pandas', 'sklearn',
@@ -72,17 +65,16 @@ print("=" * 60)
 ============================================================
 PACKAGE AVAILABILITY CHECK
 ============================================================
-✓ scipy           - Available
+✗ scipy           - MISSING
 ✓ pandas          - Available
-✓ sklearn         - Available
+✗ sklearn         - MISSING
 ✓ matplotlib      - Available
-✓ seaborn         - Available
+✗ seaborn         - MISSING
 ✓ ipywidgets      - Available
 ✓ debugpy         - Available
-✗ biopython       - MISSING
 ✓ numpy           - Available
 ============================================================
-⚠ Missing packages: biopython
+⚠ Missing packages: scipy, sklearn, seaborn
 ============================================================
 #+end_example
 

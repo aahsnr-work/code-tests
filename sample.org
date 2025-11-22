@@ -1,0 +1,43 @@
+#+title: Sample
+
+#+begin_src python :tangle /tmp/test-analysis.py :comments link :session test
+import pandas as pd
+import numpy as np
+
+def load_data():
+    """Load sample data."""
+    return pd.DataFrame({
+        'a': [1, 2, 3, 4, 5],
+        'b': [10, 20, 30, 40, 50]
+    })
+
+def analyze(df):
+    """Compute basic statistics."""
+    return df.describe()
+#+end_src
+
+#+RESULTS:
+
+* Analysis
+
+Now let's use our functions:
+
+#+begin_src python :tangle /tmp/test-analysis.py :comments link :session test :results output
+df = load_data()
+stats = analyze(df)
+print("Dataset Statistics:")
+print(stats)
+
+#+end_src
+
+#+RESULTS:
+: Dataset Statistics:
+:               a          b
+: count  5.000000   5.000000
+: mean   3.000000  30.000000
+: std    1.581139  15.811388
+: min    1.000000  10.000000
+: 25%    2.000000  20.000000
+: 50%    3.000000  30.000000
+: 75%    4.000000  40.000000
+: max    5.000000  50.000000
