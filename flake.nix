@@ -25,7 +25,6 @@
           notebook
           ipykernel
           ipywidgets
-          numpy
           scipy
           pandas
           scikit-learn

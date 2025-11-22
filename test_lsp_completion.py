@@ -14,9 +14,10 @@ Instructions:
 
 import numpy as np
 import pandas as pd
-from typing import List, Dict, Optional
+from typing import list, Dict, Optional
 from dataclasses import dataclass
 
+arry1 = np.array([1,2,3])
 
 # ==============================================================================
 # Test 1: Module-level completions

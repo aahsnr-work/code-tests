@@ -1,6 +1,6 @@
 #+TITLE: Jupyter Integration Test Suite for Doom Emacs
 #+AUTHOR: Test Suite
-#+PROPERTY: header-args:jupyter-python
+#+PROPERTY: header-args:python :tangle jupyter_test_org.py
 
 * Setup Instructions
 
@@ -26,14 +26,24 @@ print(f"Architecture: {platform.machine()}")
 print("=" * 60)
 #+end_src
 
+#+RESULTS:
+: ============================================================
+: ENVIRONMENT INFORMATION
+: ============================================================
+: Python Version: 3.13.9 (main, Oct 14 2025, 13:52:31) [GCC 14.3.0]
+: Python Executable: /nix/store/7gl4khq26h625mpqzkiiqsify3hclar1-python3-3.13.9/bin/python
+: Platform: Linux-6.17.8-2-cachyos-x86_64-with-glibc2.40
+: Architecture: x86_64
+: ============================================================
+
 * Test 2: Package Availability Check
 
-#+begin_src jupyter-python :session py
+#+begin_src python
 """Test that all required packages from flake.nix are available"""
 required_packages = [
-    'numpy', 'scipy', 'pandas', 'sklearn',
+    'scipy', 'pandas', 'sklearn',
     'matplotlib', 'seaborn', 'ipywidgets',
-    'debugpy', 'biopython'
+    'debugpy', 'numpy'
 ]
 
 print("=" * 60)
@@ -62,7 +72,6 @@ print("=" * 60)
 ============================================================
 PACKAGE AVAILABILITY CHECK
 ============================================================
-✓ numpy           - Available
 ✓ scipy           - Available
 ✓ pandas          - Available
 ✓ sklearn         - Available
@@ -71,6 +80,7 @@ PACKAGE AVAILABILITY CHECK
 ✓ ipywidgets      - Available
 ✓ debugpy         - Available
 ✗ biopython       - MISSING
+✓ numpy           - Available
 ============================================================
 ⚠ Missing packages: biopython
 ============================================================
@@ -81,7 +91,7 @@ PACKAGE AVAILABILITY CHECK
 This test verifies that LSP Bridge provides completions for Python code.
 Type =pd.= and trigger completion (usually =C-SPC= or =TAB=) to see pandas methods.
 
-#+begin_src jupyter-python :results silent
+#+begin_src python
 import pandas as pd
 import numpy as np
 
@@ -90,11 +100,18 @@ import numpy as np
 # Type: np.<TAB> to see completions
 # Hover over 'DataFrame' to see documentation
 df = pd.DataFrame({'a': [1, 2, 3], 'b': [4, 5, 6]})
+print(df)
 #+end_src
+
+#+RESULTS:
+:    a  b
+: 0  1  4
+: 1  2  5
+: 2  3  6
 
 * Test 4: Variable Inspection and Data Display
 
-#+begin_src jupyter-python :results value
+#+begin_src python :session py
 """Test dataframe display and variable inspection"""
 import pandas as pd
 import numpy as np
@@ -108,79 +125,20 @@ data = {
 }
 
 df = pd.DataFrame(data)
-df
+print(df)
 #+end_src
 
 #+RESULTS:
-#+begin_export html
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Name</th>
-      <th>Age</th>
-      <th>Score</th>
-      <th>City</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Alice</td>
-      <td>25</td>
-      <td>92.5</td>
-      <td>NYC</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>Bob</td>
-      <td>30</td>
-      <td>88.0</td>
-      <td>LA</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>Charlie</td>
-      <td>35</td>
-      <td>95.5</td>
-      <td>Chicago</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>David</td>
-      <td>28</td>
-      <td>79.0</td>
-      <td>Houston</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>Eve</td>
-      <td>32</td>
-      <td>91.5</td>
-      <td>Phoenix</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-#+end_export
+:       Name  Age  Score     City
+: 0    Alice   25   92.5      NYC
+: 1      Bob   30   88.0       LA
+: 2  Charlie   35   95.5  Chicago
+: 3    David   28   79.0  Houston
+: 4      Eve   32   91.5  Phoenix
 
 * Test 5: Basic Plotting (Matplotlib)
 
-#+begin_src jupyter-python :results file
+#+begin_src python
 """Test matplotlib inline image display"""
 import matplotlib.pyplot as plt
 import numpy as np
@@ -276,7 +234,7 @@ output_file
 
 #+RESULTS:
 :RESULTS:
-: /tmp/ipykernel_140013/2331300373.py:29: FutureWarning:
+: /tmp/ipykernel_771123/2331300373.py:29: FutureWarning:
 :
 : Passing `palette` without assigning `hue` is deprecated and will be removed in v0.14.0. Assign the `x` variable to `hue` and set `legend=False` for the same effect.
 :
