@@ -1,43 +1,364 @@
-#+title: Sample
+#+TITLE: Jupyter + Cross-Block LSP Demo
+#+AUTHOR: Ahsanur Rahman
+#+PROPERTY: header-args:jupyter-python :session main :async yes :kernel python3
+#+PROPERTY: header-args:jupyter-python+ :tangle ./notebook.py :comments link
 
-#+begin_src python :tangle /tmp/test-analysis.py :comments link :session test
-import pandas as pd
+* How Cross-Block LSP Works (The Oglot Approach)
+
+This notebook demonstrates TRUE cross-block LSP awareness using the oglot-style approach.
+
+** Two Ways to Edit:
+
+*** In Org File (Current View):
+- Press ~C-c C-c~ to execute blocks (Jupyter)
+- Get runtime completions from kernel
+- Each block is LSP-isolated (limitation)
+
+*** In org-src Edit Buffer (~C-c '~ KEY):
+- Press ~C-c '~ on any block to edit with full context
+- Full tangled file loads (hidden via narrowing)
+- LSP sees ALL blocks together!
+- You see/edit only current block
+- Get complete cross-block LSP features
+
+** The Magic:
+When you press ~C-c '~:
+1. Entire notebook.py loads into edit buffer
+2. Emacs narrows to show only your block
+3. lsp-bridge sees the complete file
+4. You get cross-block type checking, completions, navigation!
+
+
+* Block 1: Imports and Type Definitions
+
+Execute this first with ~C-c C-c~:
+
+:RESULTS:
+#+begin_src jupyter-python :results output
 import numpy as np
+import pandas as pd
+from typing import List, Dict, Optional, Tuple
 
-def load_data():
-    """Load sample data."""
-    return pd.DataFrame({
-        'a': [1, 2, 3, 4, 5],
-        'b': [10, 20, 30, 40, 50]
-    })
+arry1 = np.array([1,2,3])
+print(arry1)
 
-def analyze(df):
-    """Compute basic statistics."""
-    return df.describe()
-#+end_src
-
-#+RESULTS:
-
-* Analysis
-
-Now let's use our functions:
-
-#+begin_src python :tangle /tmp/test-analysis.py :comments link :session test :results output
-df = load_data()
-stats = analyze(df)
-print("Dataset Statistics:")
-print(stats)
+x = 2
+y = 3
 
 #+end_src
 
 #+RESULTS:
-: Dataset Statistics:
-:               a          b
-: count  5.000000   5.000000
-: mean   3.000000  30.000000
-: std    1.581139  15.811388
-: min    1.000000  10.000000
-: 25%    2.000000  20.000000
-: 50%    3.000000  30.000000
-: 75%    4.000000  40.000000
-: max    5.000000  50.000000
+: [1 2 3]
+
+#+begin_src jupyter-python
+arry2 = np.array([1, 2, 3])
+print(arry2)
+#+end_src
+
+
+#+RESULTS:
+: [1 2 3]
+
+
+Now try pressing ~C-c '~ on this block:
+- You'll see ONLY this block
+- But LSP knows about the entire file
+- Try typing ~pd.~ - you get full completions
+
+* Block 2: Function Definition
+
+#+begin_src jupyter-python
+def calculate_statistics(numbers: List[float]) -> Dict[str, float]:
+    """Calculate comprehensive statistics for a list of numbers.
+
+    Args:
+        numbers: List of numbers to analyze
+        
+    Returns:
+        Dictionary containing mean, median, std, min, max
+    """
+    arr = np.array(numbers)
+    return {
+        'mean': float(np.mean(arr)),
+        'median': float(np.median(arr)),
+        'std': float(np.std(arr)),
+        'min': float(np.min(arr)),
+        'max': float(np.max(arr))
+    }
+
+# This function is now in both Jupyter kernel AND notebook.py
+#+end_src
+
+#+RESULTS:
+
+* Block 3: Create Sample Data
+
+#+begin_src jupyter-python
+# Create sample dataset
+data = {
+    'name': ['Alice', 'Bob', 'Charlie', 'David', 'Eve'],
+    'age': [25, 30, 35, 40, 28],
+    'score': [85, 92, 78, 88, 95],
+    'category': ['A', 'B', 'A', 'B', 'A']
+}
+
+df = pd.DataFrame(data)
+print("Sample Data:")
+print(df)
+#+end_src
+
+#+RESULTS:
+: Sample Data:
+:       name  age  score category
+: 0    Alice   25     85        A
+: 1      Bob   30     92        B
+: 2  Charlie   35     78        A
+: 3    David   40     88        B
+: 4      Eve   28     95        A
+
+* Block 4: Using the Function - PRESS C-c ' HERE!
+
+**THIS IS WHERE YOU SEE THE MAGIC**
+
+Press ~C-c '~ on this block to edit it:
+
+#+begin_src jupyter-python
+# When editing this block with C-c ':
+# 
+# 1. Type: calculate_statistics(
+#    → LSP shows the function signature from Block 2!
+#    → You get parameter hints and return type
+#
+# 2. Type: stats['
+#    → Jupyter shows actual dict keys from runtime!
+#    → LSP provides type information
+#
+# 3. Try: go to definition (gd) on calculate_statistics
+#    → It jumps to Block 2's definition!
+#    → This works because LSP sees the full file
+
+scores = df['score'].tolist()
+stats = calculate_statistics(scores)
+
+print("Statistics for scores:")
+for key, value in stats.items():
+    print(f"  {key}: {value:.2f}")
+#+end_src
+
+#+RESULTS:
+: Statistics for scores:
+:   mean: 87.60
+:   median: 88.00
+:   std: 5.89
+:   min: 78.00
+:   max: 95.00
+
+** Try These in the org-src Buffer:
+
+While editing this block with ~C-c '~:
+
+1. ~gd~ on =calculate_statistics= → Jumps to definition (Block 2)!
+2. ~K~ on =calculate_statistics= → Shows docstring
+3. Type =stats['= → Kernel shows actual keys
+4. ~C-x n w~ → Widen to see ALL blocks (current is editable, others gray)
+5. ~SPC m l ?~ → Show LSP integration status
+
+* Block 5: Another Function - Testing Cross-Block References
+
+#+begin_src jupyter-python
+def analyze_dataframe(df: pd.DataFrame) -> Dict[str, any]:
+    """Analyze a DataFrame and return comprehensive statistics.
+    
+    Args:
+        df: pandas DataFrame to analyze
+        
+    Returns:
+        Dictionary with various statistics
+    """
+    numeric_cols = df.select_dtypes(include=[np.number]).columns
+    
+    result = {}
+    for col in numeric_cols:
+        # Notice: We're using calculate_statistics from Block 2!
+        result[col] = calculate_statistics(df[col].tolist())
+    
+    return result
+
+# Function now available to all blocks
+#+end_src
+
+#+RESULTS:
+
+* Block 6: Using Multiple Functions - PRESS C-c ' HERE TOO!
+
+Press ~C-c '~ and see how LSP knows about BOTH functions:
+
+#+begin_src jupyter-python
+# When you press C-c ' on THIS block:
+# 
+# Try typing: analyze_dataframe(
+# → LSP shows the signature (even though it's in Block 5)
+#
+# Try typing: calculate_statistics(
+# → LSP shows the signature (even though it's in Block 2)
+#
+# This is TRUE cross-block LSP awareness!
+
+full_analysis = analyze_dataframe(df)
+
+print("Full DataFrame Analysis:")
+for column, stats in full_analysis.items():
+    print(f"\n{column}:")
+    for stat_name, stat_value in stats.items():
+        print(f"  {stat_name}: {stat_value:.2f}")
+#+end_src
+
+#+RESULTS:
+#+begin_example
+Full DataFrame Analysis:
+
+age:
+  mean: 31.60
+  median: 30.00
+  std: 5.31
+  min: 25.00
+  max: 40.00
+
+score:
+  mean: 87.60
+  median: 88.00
+  std: 5.89
+  min: 78.00
+  max: 95.00
+#+end_example
+
+* Block 7: Type Checking Demo
+
+This block has intentional type errors. Press ~C-c '~ to see them:
+
+#+begin_src jupyter-python
+# Uncomment these lines and press C-c ' to see LSP diagnostics:
+
+# This will show a type error from basedpyright:
+# wrong_type: int = "not an integer"
+
+# This will show undefined variable:
+# print(undefined_variable)
+
+# This will show wrong argument type:
+# result = calculate_statistics("not a list")
+
+# LSP catches these BEFORE execution!
+# In the org-src buffer, you'll see red underlines
+#+end_src
+
+#+RESULTS:
+
+* Block 8: Demonstrating Jump to Definition
+
+#+begin_src python
+# Press C-c ' to edit this block, then:
+# 
+# 1. Place cursor on 'calculate_statistics'
+# 2. Press 'gd' (go to definition)
+# 3. It jumps to Block 2!
+#
+# 4. Place cursor on 'analyze_dataframe'  
+# 5. Press 'gd'
+# 6. It jumps to Block 5!
+#
+# This is the power of cross-block LSP awareness
+
+final_scores = calculate_statistics([78, 85, 88, 92, 95])
+final_analysis = analyze_dataframe(df)
+
+print("Final Results:")
+print(f"Score stats: {final_scores}")
+#+end_src
+
+#+RESULTS:
+: Final Results:
+: Score stats: {'mean': 87.6, 'median': 88.0, 'std': 5.885575587824865, 'min': 78.0, 'max': 95.0}
+
+* Comparison: Three Editing Modes
+
+| Mode | How to Access | LSP Sees | Best For |
+|------|---------------|----------|----------|
+| **Org buffer** | (you're here now) | Only current block | Quick execution, literate programming |
+| **org-src buffer** | ~C-c '~ on any block | ALL blocks! | Type-safe editing, refactoring |
+| **notebook.py** | ~SPC m j o~ | ALL blocks | Heavy refactoring, debugging |
+
+* Tips for Maximum Productivity
+
+** Quick Execution Workflow:
+1. Write code in org blocks (literate style)
+2. Execute with ~C-c C-c~ (Jupyter keeps state)
+3. Get runtime completions automatically
+
+** Type-Safe Editing Workflow:
+1. Press ~C-c '~ on block you want to edit
+2. Get full LSP features (cross-block aware)
+3. LSP catches errors before execution
+4. Press ~C-c '~ to save and exit
+
+** When to Use Each Mode:
+- *In org*: Initial development, exploration, presentation
+- *C-c ' (org-src)*: Detailed editing with full IDE features
+- *notebook.py*: Major refactoring, project-wide changes
+
+* How to Verify It's Working
+
+** Test 1: Function Signature
+1. Press ~C-c '~ on Block 6
+2. Delete ~analyze_dataframe(df)~
+3. Start typing: ~analyze_data~
+4. LSP completion shows =analyze_dataframe= with its signature!
+5. Even though it's defined in Block 5
+
+** Test 2: Go to Definition  
+1. Press ~C-c '~ on any block that uses =calculate_statistics=
+2. Place cursor on the function name
+3. Press ~gd~
+4. It jumps to Block 2's definition!
+
+** Test 3: Type Checking
+1. Press ~C-c '~ on any block
+2. Try: ~result: int = "string"~
+3. LSP shows error immediately (red underline)
+4. This is STATIC analysis, not runtime!
+
+** Test 4: Widen to See Context
+1. Press ~C-c '~ on any block
+2. Press ~C-x n w~ to widen
+3. You see ALL blocks loaded in buffer
+4. Current block is editable, others are gray/read-only
+5. LSP analyzes everything!
+
+* Keyboard Shortcuts Reminder
+
+| Key | Action | Where |
+|-----|--------|-------|
+| ~C-c C-c~ | Execute block | Org buffer |
+| ~C-c '~ | Edit with full LSP | Org buffer |
+| ~C-c '~ | Exit and save | org-src buffer |
+| ~C-x n w~ | Widen to see context | org-src buffer |
+| ~gd~ | Go to definition | org-src buffer (with LSP) |
+| ~K~ | Show documentation | org-src buffer (with LSP) |
+| ~SPC m l ?~ | Show LSP status | org-src buffer |
+| ~SPC m l r~ | Retangle & refresh | org-src buffer |
+
+* Summary
+
+This setup gives you:
+
+✅ **Jupyter kernel execution** - Runtime intelligence, stateful REPL
+✅ **Cross-block LSP** - Type checking, navigation across ALL blocks  
+✅ **Literate programming** - Documentation mixed with code
+✅ **Seamless workflow** - Switch between modes as needed
+
+The oglot-style approach bridges the gap:
+- LSP requirement: needs a complete file → buffer loads full file
+- User experience: want to edit one block → narrowing shows only yours
+- Cross-block awareness: LSP must see other blocks → they're loaded (hidden)
+
+**Try it now**: Press ~C-c '~ on Block 4 or Block 6 and experience true cross-block LSP! 🚀

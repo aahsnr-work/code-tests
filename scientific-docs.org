@@ -6,7 +6,6 @@
 #+OPTIONS: toc:3 num:t H:5 ^:{} tags:nil
 #+PROPERTY: header-args:python :session qho_master :results output :exports both
 #+LATEX_CLASS: article
-#+LATEX_HEADER: \usepackage{amsmath,physics,siunitx,booktabs,graphicx,listings,hyperref}
 #+LATEX_HEADER: \usepackage[margin=1in]{geometry}
 
 * Document Metadata :noexport:
@@ -41,6 +40,7 @@ The quantum harmonic oscillator is the most important exactly solvable problem i
 
 The Hamiltonian is:
 $\hat{H} = \frac{\hat{p}^2}{2m} + \frac{1}{2}m\omega^2\hat{x}^2$
+
 
 Energy eigenvalues:
 #+begin_equation
