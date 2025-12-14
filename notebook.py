@@ -1,6 +1,5 @@
 # [[file:sample.org::*Block 1: Imports and Type Definitions][Block 1: Imports and Type Definitions:1]]
 import numpy as np
-arry1  = np
 import pandas as pd
 from typing import List, Dict, Optional, Tuple
 # Block 1: Imports and Type Definitions:1 ends here
@@ -11,7 +10,7 @@ def calculate_statistics(numbers: List[float]) -> Dict[str, float]:
 
     Args:
         numbers: List of numbers to analyze
-        
+
     Returns:
         Dictionary containing mean, median, std, min, max
     """
@@ -41,9 +40,11 @@ print("Sample Data:")
 print(df)
 # Block 3: Create Sample Data:1 ends here
 
+arry1 = np.arr
+
 # [[file:sample.org::*Block 4: Using the Function - PRESS C-c ' HERE!][Block 4: Using the Function - PRESS C-c ' HERE!:1]]
 # When editing this block with C-c ':
-# 
+#
 # 1. Type: calculate_statistics(
 #    → LSP shows the function signature from Block 2!
 #    → You get parameter hints and return type
@@ -67,20 +68,20 @@ for key, value in stats.items():
 # [[file:sample.org::*Block 5: Another Function - Testing Cross-Block References][Block 5: Another Function - Testing Cross-Block References:1]]
 def analyze_dataframe(df: pd.DataFrame) -> Dict[str, any]:
     """Analyze a DataFrame and return comprehensive statistics.
-    
+
     Args:
         df: pandas DataFrame to analyze
-        
+
     Returns:
         Dictionary with various statistics
     """
     numeric_cols = df.select_dtypes(include=[np.number]).columns
-    
+
     result = {}
     for col in numeric_cols:
         # Notice: We're using calculate_statistics from Block 2!
         result[col] = calculate_statistics(df[col].tolist())
-    
+
     return result
 
 # Function now available to all blocks
@@ -88,7 +89,7 @@ def analyze_dataframe(df: pd.DataFrame) -> Dict[str, any]:
 
 # [[file:sample.org::*Block 6: Using Multiple Functions - PRESS C-c ' HERE TOO!][Block 6: Using Multiple Functions - PRESS C-c ' HERE TOO!:1]]
 # When you press C-c ' on THIS block:
-# 
+#
 # Try typing: analyze_dataframe(
 # → LSP shows the signature (even though it's in Block 5)
 #
@@ -124,12 +125,12 @@ for column, stats in full_analysis.items():
 
 # [[file:sample.org::*Block 8: Demonstrating Jump to Definition][Block 8: Demonstrating Jump to Definition:1]]
 # Press C-c ' to edit this block, then:
-# 
+#
 # 1. Place cursor on 'calculate_statistics'
 # 2. Press 'gd' (go to definition)
 # 3. It jumps to Block 2!
 #
-# 4. Place cursor on 'analyze_dataframe'  
+# 4. Place cursor on 'analyze_dataframe'
 # 5. Press 'gd'
 # 6. It jumps to Block 5!
 #

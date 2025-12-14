@@ -56,8 +56,7 @@
         };
 
         devTools = with pkgs; [
-          basedpyright
-          tex
+          pyright
           ruff
         ];
       in
