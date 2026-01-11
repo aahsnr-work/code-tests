@@ -20,8 +20,8 @@
           config.allowUnfree = true;
         };
 
-        pythonPackages = with pkgs.python3Packages; [
-          jupyterlab
+        pythonPackages = with pkgs.python313Packages; [
+          jupyter-core
           notebook
           ipykernel
           ipywidgets
@@ -33,6 +33,7 @@
           debugpy
           pytest
           biopython
+          pygments
         ];
 
         # TeX packages from default.nix
@@ -56,8 +57,6 @@
         };
 
         devTools = with pkgs; [
-          pyright
-          ruff
         ];
       in
       {

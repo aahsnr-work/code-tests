@@ -26,7 +26,7 @@ arry1 = np.array([1,2,3])
 def test_module_completions():
     """
     Test completion for standard library and third-party modules.
-    
+
     Type these and trigger completion:
     - np.<COMPLETE>     # Should show: array, zeros, ones, random, etc.
     - pd.<COMPLETE>     # Should show: DataFrame, Series, read_csv, etc.
@@ -34,10 +34,10 @@ def test_module_completions():
     """
     # Test NumPy completions
     arr = np.  # Type . and trigger completion here
-    
-    # Test Pandas completions  
+
+    # Test Pandas completions
     df = pd.  # Type . and trigger completion here
-    
+
     # Test nested module completions
     random_data = np.random.  # Type . and trigger completion here
 
@@ -49,7 +49,7 @@ def test_module_completions():
 def test_object_method_completions():
     """
     Test completion for object methods and attributes.
-    
+
     Type these and trigger completion:
     - arr.<COMPLETE>    # Should show: shape, dtype, mean, sum, etc.
     - df.<COMPLETE>     # Should show: head, tail, describe, columns, etc.
@@ -58,15 +58,15 @@ def test_object_method_completions():
     # Array methods
     arr = np.array([1, 2, 3, 4, 5])
     # arr.<COMPLETE>  # Try: mean, std, reshape, T, dtype
-    
+
     # DataFrame methods
     df = pd.DataFrame({'a': [1, 2, 3], 'b': [4, 5, 6]})
     # df.<COMPLETE>  # Try: head, describe, groupby, plot
-    
+
     # String methods
     s = "hello world"
     # s.<COMPLETE>  # Try: upper, lower, split, replace
-    
+
     # List methods
     lst = [1, 2, 3]
     # lst.<COMPLETE>  # Try: append, extend, pop, sort
@@ -83,7 +83,7 @@ def process_data(
 ) -> pd.DataFrame:
     """
     Test that type hints provide proper completions.
-    
+
     Inside this function:
     - numbers.<COMPLETE>  # Should show list methods
     - mapping.<COMPLETE>  # Should show dict methods
@@ -91,11 +91,11 @@ def process_data(
     """
     # numbers.<COMPLETE>  # Try: append, extend, sort
     # mapping.<COMPLETE>  # Try: get, keys, values, items
-    
+
     if optional_name is not None:
         # optional_name.<COMPLETE>  # Try: upper, lower, split
         pass
-    
+
     return pd.DataFrame({'numbers': numbers})
 
 
@@ -109,15 +109,15 @@ class Person:
     name: str
     age: int
     email: str
-    
+
     def greet(self) -> str:
         """Return a greeting message."""
         return f"Hello, I'm {self.name}"
-    
+
     def is_adult(self) -> bool:
         """Check if person is an adult."""
         return self.age >= 18
-    
+
     @property
     def info(self) -> str:
         """Get person info as string."""
@@ -127,13 +127,13 @@ class Person:
 def test_class_completions():
     """
     Test completions for class attributes and methods.
-    
+
     Type these and trigger completion:
     - person.<COMPLETE>  # Should show: name, age, email, greet, is_adult, info
     - Person.<COMPLETE>  # Should show class methods and attributes
     """
     person = Person(name="Alice", age=30, email="alice@example.com")
-    
+
     # person.<COMPLETE>  # Try: name, age, email, greet, is_adult, info
     # Person.<COMPLETE>  # Try: __init__, greet, is_adult
 
@@ -145,7 +145,7 @@ def test_class_completions():
 def test_chained_completions():
     """
     Test completions in method chains.
-    
+
     Each step in the chain should provide appropriate completions.
     """
     df = pd.DataFrame({
@@ -153,7 +153,7 @@ def test_chained_completions():
         'age': [25, 30, 35],
         'salary': [50000, 60000, 75000]
     })
-    
+
     # Test chaining - each . should trigger appropriate completions
     result = (
         df
@@ -163,7 +163,7 @@ def test_chained_completions():
         .head(2)
         # .<COMPLETE>  # Try: to_dict, to_csv, to_json
     )
-    
+
     # String method chaining
     text = "  Hello World  "
     result = (
@@ -183,7 +183,7 @@ def test_chained_completions():
 def test_import_completions():
     """
     Test completions for import statements.
-    
+
     Type these and trigger completion:
     - from numpy import <COMPLETE>  # Should show numpy exports
     - from pandas import <COMPLETE>  # Should show pandas exports
@@ -208,7 +208,7 @@ def complex_function(
 ) -> pd.DataFrame:
     """
     Test parameter name completion in function calls.
-    
+
     When calling this function, parameter names should complete.
     """
     return data.sort_values(column_name, ascending=ascending)
@@ -217,12 +217,12 @@ def complex_function(
 def test_parameter_completions():
     """
     Test that parameter names complete when calling functions.
-    
+
     Type: complex_function(<COMPLETE>
     Should show: data=, column_name=, threshold=, ascending=
     """
     df = pd.DataFrame({'a': [3, 1, 2]})
-    
+
     # complex_function(<COMPLETE>  # Should show parameter names
     result = complex_function(
         # <COMPLETE>  # Type parameter names
@@ -243,11 +243,11 @@ def test_context_aware_completions():
     x = 10
     y = 20
     # Type: z = x <COMPLETE>  # Should show: +, -, *, /, %, **, //, etc.
-    
-    # String context  
+
+    # String context
     name = "Alice"
     # name.<COMPLETE>  # Should show string methods
-    
+
     # DataFrame context after filtering
     df = pd.DataFrame({'a': [1, 2, 3], 'b': [4, 5, 6]})
     filtered = df[df['a'] > 1]
@@ -268,24 +268,24 @@ def test_dictionary_completions():
         'email': 'alice@example.com',
         'city': 'New York'
     }
-    
+
     # Some LSP servers provide key completions:
     # person_data['<COMPLETE>  # Might show: name, age, email, city
-    
+
     # TypedDict provides better support
     from typing import TypedDict
-    
+
     class PersonDict(TypedDict):
         name: str
         age: int
         email: str
-    
+
     typed_person: PersonDict = {
         'name': 'Bob',
         'age': 25,
         'email': 'bob@example.com'
     }
-    
+
     # typed_person['<COMPLETE>  # Should show: name, age, email
 
 
@@ -296,21 +296,21 @@ def test_dictionary_completions():
 def test_signature_help():
     """
     Test that signature help appears when typing function calls.
-    
+
     After typing the opening parenthesis, parameter info should appear.
     """
     # Test with built-in functions
     # print(  # Should show: *values, sep, end, file, flush
     # sorted(  # Should show: iterable, key, reverse
-    
+
     # Test with NumPy functions
     # np.linspace(  # Should show: start, stop, num, endpoint, retstep, dtype
     # np.random.randn(  # Should show dimension parameters
-    
+
     # Test with Pandas functions
     # pd.DataFrame(  # Should show: data, index, columns, dtype, copy
     # pd.read_csv(  # Should show: filepath_or_buffer, sep, header, etc.
-    
+
     pass
 
 
@@ -335,7 +335,7 @@ if __name__ == "__main__":
     print("  - Find references: C-c c R")
     print("  - Code actions: C-c c a")
     print("\n" + "=" * 70)
-    
+
     # Run basic tests to verify imports work
     print("\n✓ All imports successful")
     print("✓ Test classes and functions defined")

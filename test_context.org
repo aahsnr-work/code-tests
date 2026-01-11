@@ -1,0 +1,9 @@
+* Elisp Config
+    #+begin_src emacs-lisp
+(defvar my-elisp-var 123)
+    #+end_src
+
+* Python Script
+    #+begin_src python
+x = 10
+    #+end_src

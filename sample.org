@@ -40,7 +40,6 @@ import pandas as pd
 from typing import List, Dict, Optional, Tuple
 
 arry1 = np.array([1,2,3])
-print(arry1)
 
 x = 2
 y = 3

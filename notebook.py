@@ -1,8 +1,10 @@
 # [[file:sample.org::*Block 1: Imports and Type Definitions][Block 1: Imports and Type Definitions:1]]
-import numpy as np
-import pandas as pd
-from typing import List, Dict, Optional, Tuple
+from typing import Optional, Tuple, dict, list
+
 # Block 1: Imports and Type Definitions:1 ends here
+import numpy
+import pandas as pd
+
 
 # [[file:sample.org::*Block 2: Function Definition][Block 2: Function Definition:1]]
 def calculate_statistics(numbers: List[float]) -> Dict[str, float]:
@@ -16,12 +18,13 @@ def calculate_statistics(numbers: List[float]) -> Dict[str, float]:
     """
     arr = np.array(numbers)
     return {
-        'mean': float(np.mean(arr)),
-        'median': float(np.median(arr)),
-        'std': float(np.std(arr)),
-        'min': float(np.min(arr)),
-        'max': float(np.max(arr))
+        "mean": float(np.mean(arr)),
+        "median": float(np.median(arr)),
+        "std": float(np.std(arr)),
+        "min": float(np.min(arr)),
+        "max": float(np.max(arr)),
     }
+
 
 # This function is now in both Jupyter kernel AND notebook.py
 # Block 2: Function Definition:1 ends here
@@ -29,10 +32,10 @@ def calculate_statistics(numbers: List[float]) -> Dict[str, float]:
 # [[file:sample.org::*Block 3: Create Sample Data][Block 3: Create Sample Data:1]]
 # Create sample dataset
 data = {
-    'name': ['Alice', 'Bob', 'Charlie', 'David', 'Eve'],
-    'age': [25, 30, 35, 40, 28],
-    'score': [85, 92, 78, 88, 95],
-    'category': ['A', 'B', 'A', 'B', 'A']
+    "name": ["Alice", "Bob", "Charlie", "David", "Eve"],
+    "age": [25, 30, 35, 40, 28],
+    "score": [85, 92, 78, 88, 95],
+    "category": ["A", "B", "A", "B", "A"],
 }
 
 df = pd.DataFrame(data)
@@ -57,13 +60,14 @@ arry1 = np.arr
 #    → It jumps to Block 2's definition!
 #    → This works because LSP sees the full file
 
-scores = df['score'].tolist()
+scores = df["score"].tolist()
 stats = calculate_statistics(scores)
 
 print("Statistics for scores:")
 for key, value in stats.items():
     print(f"  {key}: {value:.2f}")
 # Block 4: Using the Function - PRESS C-c ' HERE!:1 ends here
+
 
 # [[file:sample.org::*Block 5: Another Function - Testing Cross-Block References][Block 5: Another Function - Testing Cross-Block References:1]]
 def analyze_dataframe(df: pd.DataFrame) -> Dict[str, any]:
@@ -83,6 +87,7 @@ def analyze_dataframe(df: pd.DataFrame) -> Dict[str, any]:
         result[col] = calculate_statistics(df[col].tolist())
 
     return result
+
 
 # Function now available to all blocks
 # Block 5: Another Function - Testing Cross-Block References:1 ends here
