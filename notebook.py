@@ -43,7 +43,7 @@ print("Sample Data:")
 print(df)
 # Block 3: Create Sample Data:1 ends here
 
-arry1 = np.arr
+arry1 = np.arr  # pyright: ignore[reportUnknownVariableType]
 
 # [[file:sample.org::*Block 4: Using the Function - PRESS C-c ' HERE!][Block 4: Using the Function - PRESS C-c ' HERE!:1]]
 # When editing this block with C-c ':
