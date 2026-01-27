@@ -1,0 +1,15 @@
+[project]
+name = "code-tests"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "basedpyright>=1.37.1",
+    "biopython>=1.86",
+    "debugpy>=1.8.19",
+    "matplotlib>=3.10.8",
+    "numpy>=2.4.1",
+    "ruff>=0.14.13",
+    "scipy>=1.17.0",
+]
